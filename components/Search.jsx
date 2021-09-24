@@ -6,24 +6,27 @@ import Soft from "./Soft";
 const Search = (props) => {
 	return (
 		<View style={styles.search}>
-			<Soft style={styles.softStyle}>
-				<TextInput placeholder="Search"/>
+			<Soft style={styles.input}>
+				<TextInput placeholder="Search" {...props}/>
 			</Soft>
-			<Button title='Search' />
 		</View>
 	);
 };
 
 const styles = StyleSheet.create({
 	search: {
-		flexDirection:'row',
+		flexDirection: "row",
 		width: "90%",
 		padding: 10,
 	},
+	input: {
+		height: 45,
+		width: "90%",
+	},
 	softStyle: {
-		width: '90%',
-		borderColor:Theme.primary,
-		borderWidth:2,
+		width: "90%",
+		borderColor: Theme.primary,
+		borderWidth: 2,
 	},
 });
 
