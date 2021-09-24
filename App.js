@@ -27,9 +27,9 @@ export default function App() {
 			<Header />
 			<StatusBar style="auto" />
 			<Stack.Navigator screenOptions={{ header: () => null }}>
-				<Stack.Screen name="Products" component={AllProducts} />
-				<Stack.Screen name="Login" component={Login} />
 				<Stack.Screen name="Register" component={Register} />
+				<Stack.Screen name="Login" component={Login} />
+				<Stack.Screen name="Products" component={AllProducts} />
 			</Stack.Navigator>
 		</NavigationContainer>
 	);
