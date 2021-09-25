@@ -24,8 +24,8 @@ export default function App() {
 	};
 	return (
 		<NavigationContainer theme={MyTheme}>
-			<Header />
 			<StatusBar style="auto" />
+			<Header />
 			<Stack.Navigator screenOptions={{ header: () => null }}>
 				<Stack.Screen name="Register" component={Register} />
 				<Stack.Screen name="Login" component={Login} />
