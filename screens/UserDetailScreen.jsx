@@ -22,11 +22,6 @@ const UserDetail = (props, { navigation }) => {
 		props.navigation.navigate("Login");
 	};
 
-	useEffect(() => {
-		validateToken();
-		console.log("USESTATE CALLED");
-	}, []);
-
 	const validateToken = () => {
 		let token = SecureStore.getItemAsync("token");
 		console.log(token);
@@ -46,6 +41,11 @@ const UserDetail = (props, { navigation }) => {
 			return;
 		}
 	};
+
+	useEffect(() => {
+		validateToken();
+		console.log("USESTATE CALLED");
+	}, []);
 
 	const getUser = async () => {
 		setUser({ user_info: [], isLoading: true });
