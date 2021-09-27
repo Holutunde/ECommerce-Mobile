@@ -11,6 +11,8 @@ import Register from "./screens/RegisterScreen";
 import Theme from "./constants/constants";
 // import MyStack from './screens/Stack';
 import AllProducts from "./screens/ProductsScreen";
+import { useFonts } from "expo-font";
+import UserDetail from "./screens/UserDetailScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -22,13 +24,19 @@ export default function App() {
 			background: "#FFFF",
 		},
 	};
+
+	const [fontLoaded, error] = useFonts({
+		Gem: require("./assets/fonts/GemunuLibre-VariableFont_wght.ttf"),
+	});
+
 	return (
 		<NavigationContainer theme={MyTheme}>
-			<Header />
 			<StatusBar style="auto" />
+			<Header />
 			<Stack.Navigator screenOptions={{ header: () => null }}>
-				<Stack.Screen name="Register" component={Register} />
 				<Stack.Screen name="Login" component={Login} />
+				<Stack.Screen name="Register" component={Register} />
+				<Stack.Screen name="UserDetail" component={UserDetail} />
 				<Stack.Screen name="Products" component={AllProducts} />
 			</Stack.Navigator>
 		</NavigationContainer>

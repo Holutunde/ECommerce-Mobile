@@ -8,26 +8,20 @@ import {
 	Image,
 	Keyboard,
 	TouchableWithoutFeedback,
+	Alert,
 } from "react-native";
+
 import Theme from "../constants/constants";
-import Header from "../components/Header";
 
 import Soft from "../components/Soft";
-import { AppLoading } from "expo";
-import {
-	useFonts,
-	Raleway_200ExtraLight,
-	Raleway_100Thin,
-	Raleway_400Regular,
-	Raleway_500Medium,
-} from "@expo-google-fonts/raleway";
+import { useFonts } from "@expo-google-fonts/raleway";
+import * as SecureStore from "expo-secure-store";
+import UserDetail from "./UserDetailScreen";
 
 const Login = (props, { navigation }) => {
-	let [fontLoaded, error] = useFonts({
-		Raleway_200ExtraLight,
-		Raleway_100Thin,
-		Raleway_400Regular,
-		Raleway_500Medium,
+	let [fontLoaded] = useFonts({
+		El: require("../assets/fonts/ElMessiri-VariableFont_wght.ttf"),
+		Gem: require("../assets/fonts/GemunuLibre-VariableFont_wght.ttf"),
 	});
 
 	const [email, setEmail] = useState("");
@@ -42,49 +36,83 @@ const Login = (props, { navigation }) => {
 	const notRegistered = () => {
 		props.navigation.navigate("Register");
 	};
-	const performLogin = () => {
-		let loginData = [
-			{
-				user_email: email,
-				user_password: password,
+
+	const loginUrl =
+		"https://ecomm-store-proj.herokuapp.com/api/v1/account/login";
+
+	var data;
+	const performLogin = async () => {
+		const details = { email, password };
+		const response = await fetch(loginUrl, {
+			method: "POST",
+			body: JSON.stringify(details),
+			headers: {
+				"Content-type": "application/json",
+				Accept: "application/json",
 			},
-		];
-		return (
-		console.log(loginData[0])
-		);
+		});
+
+		var data = await response.json();
+		if (data.access) {
+			let token = data.access;
+			await SecureStore.setItemAsync("token", token);
+		} else {
+			await SecureStore.setItemAsync("token", data.error);
+		}
+
+		props.navigation.navigate("UserDetail");
 	};
+
+	const toProducts = () => {
+		props.navigation.navigate("Products");
+	};
+
+	if (!fontLoaded) {
+		return null;
+	}
 
 	return (
 		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
 			<View style={styles.login}>
-				<Text style={styles.text}> Login to your Account </Text>
+				<Text style={{ fontSize: 20, fontFamily: Theme.font }}>
+					Login to your Account{" "}
+				</Text>
 
 				<Image
 					style={styles.loginVector}
 					source={require("../assets/login.jpg")}
 				/>
 
-				<Soft style={styles.input}>
+				<Soft style={styles.inputArea}>
 					<TextInput
+						style={styles.textInput}
 						placeholder="Email"
 						onChangeText={inputEmailHandler}
 						value={email}
 					/>
 				</Soft>
 
-				<Soft style={styles.input}>
+				<Soft style={styles.inputArea}>
 					<TextInput
+						style={styles.textInput}
 						placeholder="Password"
 						onChangeText={inputPasswordHandler}
 						value={password}
 					/>
 				</Soft>
 
-				<Button title="Login" color={Theme.primary} onPress={performLogin}/>
+				<Button title="Login" color={Theme.primary} onPress={performLogin} />
 				<View style={styles.toRegister}>
-					<Text style={styles.text2}> Don't have an account? </Text>
+					<Text style={{ fontSize: 20, fontFamily: Theme.font }}>
+						{" "}
+						Don't have an account?{" "}
+					</Text>
 					<Text
-						style={{ color: Theme.primary, ...styles.text }}
+						style={{
+							color: Theme.primary,
+							fontSize: 20,
+							fontFamily: Theme.font,
+						}}
 						onPress={notRegistered}
 					>
 						SignUp
@@ -104,19 +132,15 @@ const styles = StyleSheet.create({
 		// backgroundColor: 'blue',
 	},
 
-	text: {
-		fontSize: 20,
-		fontFamily: "Raleway_500Medium",
-	},
-	text2: {
-		fontSize: 20,
-		fontFamily: "Raleway_400Regular",
-	},
-	input: {
+	inputArea: {
 		height: 45,
-		width: "90%",
-		// borderColor: Theme.primary,
-		// borderWidth: 0.5,
+		width: "100%",
+		paddingLeft: 20,
+		alignItems: "flex-start",
+	},
+	textInput: {
+		width: "100%",
+		fontSize: 15,
 	},
 	loginVector: {
 		width: 300,
