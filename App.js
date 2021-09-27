@@ -34,7 +34,7 @@ export default function App() {
 			<StatusBar style="auto" />
 			<Header />
 			<Stack.Navigator screenOptions={{ header: () => null }}>
-				<Stack.Screen name="Product" component={Login} />
+				<Stack.Screen name="Login" component={Login} />
 				<Stack.Screen name="Register" component={Register} />
 				<Stack.Screen name="UserDetail" component={UserDetail} />
 				<Stack.Screen name="Products" component={AllProducts} />
