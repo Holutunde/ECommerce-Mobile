@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
 	StyleSheet,
 	Button,
@@ -8,33 +8,64 @@ import {
 	Image,
 	TouchableWithoutFeedback,
 	Keyboard,
+	Picker,
 } from "react-native";
+
 import Theme from "../constants/constants";
 import Soft from "../components/Soft";
-import { AppLoading } from "expo";
-import {
-	useFonts,
-	Raleway_200ExtraLight,
-	Raleway_100Thin,
-	Raleway_400Regular,
-	Raleway_500Medium,
-} from "@expo-google-fonts/raleway";
+import { AppLoading } from "expo-app-loading";
+import { useFonts } from "expo-font";
+// import {useFonts,} from "@expo-google-fonts/raleway";
 import Header from "../components/Header";
 
-const Register = (props,{navigation}) => {
-	let [fontLoaded, error] = useFonts({
-		Raleway_200ExtraLight,
-		Raleway_100Thin,
-		Raleway_400Regular,
-		Raleway_500Medium,
+const Register = (props, { navigation }) => {
+	const [fontLoaded, error] = useFonts({
+		Gem: require("../assets/fonts/GemunuLibre-VariableFont_wght.ttf"),
+		Itl: require("../assets/fonts/Italianno-Regular.ttf"),
+		El: require("../assets/fonts/ElMessiri-VariableFont_wght.ttf"),
 	});
-	const alreadyRegistered = () => {
-		props.navigation.navigate('Login');
-	}
 
-	const toProducts = () => {
-		props.navigation.navigate("Products");
-	}
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const [username, setUsername] = useState("");
+	const [gender, setGender] = useState("");
+
+	const inputEmailHandler = (enteredEmail) => {
+		setEmail(enteredEmail);
+	};
+	const inputPasswordHandler = (enteredPassword) => {
+		setPassword(enteredPassword);
+	};
+	const inputUsernameHandler = (enteredUsername) => {
+		setUsername(enteredUsername);
+	};
+	const inputGenderHandler = (enteredGender) => {
+		setGender(enteredGender);
+	};
+
+	const signupUrl =
+		"https://ecomm-store-proj.herokuapp.com/api/v1/account/signup";
+	const performSignup = async () => {
+		const details = { email, password,username,gender };
+
+		const response = await fetch(signupUrl, {
+			method: "POST",
+			body: JSON.stringify(details),
+			headers: {
+				"Content-type": "application/json",
+				Accept: "application/json",
+			},
+		});
+
+		const data = await response.json();
+		console.log(data);
+		// history.push("/");
+		props.navigation.navigate("Login");
+	};
+
+	const alreadyRegistered = () => {
+		props.navigation.navigate("Login");
+	};
 
 	return (
 		<TouchableWithoutFeedback
@@ -44,29 +75,70 @@ const Register = (props,{navigation}) => {
 		>
 			{/* <Header /> */}
 			<View style={styles.register}>
-				<Text style={styles.text1}> Create A New Account </Text>
+				<Text style={{ fontSize: 20, fontFamily: Theme.font }}>
+					Create A New Account{" "}
+				</Text>
 
 				<Image
 					style={styles.registerVector}
 					source={require("../assets/register.jpg")}
 				/>
-				<Soft style={styles.input}>
-					<TextInput placeholder="Full Name" />
+				<Soft style={styles.inputArea}>
+					<TextInput
+						style={styles.textInput}
+						placeholder="Email"
+						onChangeText={inputEmailHandler}
+						value={email}
+					/>
 				</Soft>
-				<Soft style={styles.input}>
-					<TextInput placeholder="Email" />
+
+				<Soft style={styles.inputArea}>
+					<TextInput
+						style={styles.textInput}
+						placeholder="Username"
+						onChangeText={inputUsernameHandler}
+						value={username}
+					/>
 				</Soft>
-				<Soft style={styles.input}>
-					<TextInput placeholder="Phone Number" />
+				<Soft style={styles.inputArea}>
+					<TextInput
+						style={styles.textInput}
+						placeholder="Gender"
+						onChangeText={inputGenderHandler}
+						value={gender}
+					/>
 				</Soft>
-				<Soft style={styles.input}>
-					<TextInput placeholder="Password" />
+
+				<Soft style={styles.inputArea}>
+					<TextInput
+						style={styles.textInput}
+						placeholder="Password"
+						onChangeText={inputPasswordHandler}
+						value={password}
+					/>
 				</Soft>
-				<Button style={styles.button} title="Register" color="#529ae4" onPress={ toProducts}/>
+				<Button
+					style={styles.button}
+					title="Register"
+					color="#529ae4"
+					onPress={performSignup}
+				/>
 				<View style={styles.toLogin}>
-					<Text style={styles.text2}> Already have an account? </Text>
 					<Text
-						style={{ color: Theme.primary, ...styles.text1 }}
+						style={{
+							// color: Theme.primary,
+							fontSize: 20,
+							fontFamily: Theme.font,
+						}}
+					>
+						Already have an account?
+					</Text>
+					<Text
+						style={{
+							color: Theme.primary,
+							fontSize: 20,
+							fontFamily: Theme.font,
+						}}
 						onPress={alreadyRegistered}
 					>
 						Login
@@ -86,20 +158,16 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 
-	text1: {
-		fontSize: 20,
-		fontFamily: "Raleway_500Medium",
-	},
-	text2: {
-		fontSize: 20,
-		fontFamily: "Raleway_400Regular",
-	},
-
-	input: {
+	inputArea: {
 		height: 45,
-		width: "90%",
+		width: "100%",
+		paddingLeft: 20,
+		alignItems: "flex-start",
 	},
-
+	textInput: {
+		width: "100%",
+		fontSize: 15,
+	},
 	registerVector: {
 		width: 300,
 		height: 300,
