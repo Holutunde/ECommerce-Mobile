@@ -81,7 +81,6 @@ const Login = (props, { navigation }) => {
 		const email = data.email;
 		const password = data.password;
 		const details = { email, password };
-
 		const response = await fetch(loginUrl, {
 			method: "POST",
 			body: JSON.stringify(details),
@@ -92,8 +91,7 @@ const Login = (props, { navigation }) => {
 		});
 
 		const loginData = await response.json();
-		console.log("Login Data", loginData);
-		saveToken(data);
+		saveToken(loginData);
 		toUserDetail();
 	};
 
@@ -101,10 +99,8 @@ const Login = (props, { navigation }) => {
 		try {
 			const jsonData = JSON.stringify(data);
 			await AsyncStorage.setItem("loginInfo", jsonData);
-			console.log("Data Saved Successfully!");
 		} catch (error) {
 			alert(error);
-			console.log("Data Saved Successfully!");
 		}
 	};
 
