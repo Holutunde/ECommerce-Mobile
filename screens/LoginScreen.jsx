@@ -79,6 +79,7 @@ const Login = (props, { navigation }) => {
 		"https://ecomm-store-proj.herokuapp.com/api/v1/account/login";
 
 	const performLogin = async () => {
+		console.log(1);
 		const details = { email, password };
 		const response = await fetch(loginUrl, {
 			method: "POST",

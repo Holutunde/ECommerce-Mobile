@@ -57,6 +57,22 @@ const Register = (props, { navigation }) => {
         }
     }
 
+	const textEmailChange = (val) => {
+        if( val.length !== 0 ) {
+            setData({
+                ...data,
+                email: val,
+                check_textInputChange: true
+            });
+        } else {
+            setData({
+                ...data,
+                email: val,
+                check_textInputChange: false
+            });
+        }
+    }
+
     const handlePasswordChange = (val) => {
         setData({
             ...data,
@@ -83,13 +99,14 @@ const Register = (props, { navigation }) => {
             ...data,
             confirm_secureTextEntry: !data.confirm_secureTextEntry
         });
-    }
-
+	}
 
 	const signupUrl =
 		"https://ecomm-store-proj.herokuapp.com/api/v1/account/signup";
 	const performSignup = async () => {
+		console.log(data);
 		const details = { email, password,username,gender };
+
 
 		const response = await fetch(signupUrl, {
 			method: "POST",
@@ -139,7 +156,7 @@ const Register = (props, { navigation }) => {
                     placeholder="Email"
                     style={styles.textInput}
                     autoCapitalize="none"
-                    onChangeText={(val) => textInputChange(val)}
+                    onChangeText={(val) => textEmailChange(val)}
                 />
                 {data.check_textInputChange ? 
                 <Animatable.View
@@ -244,7 +261,7 @@ const Register = (props, { navigation }) => {
             </View>
 			
 				<TouchableOpacity
-                    onPress={alreadyRegistered}
+                    onPress={performSignup}
                     style={styles.signIn}
                 >
                     <Text style={styles.textSign}>Sign up</Text>
