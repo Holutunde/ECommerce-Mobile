@@ -6,6 +6,7 @@ import {
 	TextInput,
 	Text,
 	Image,
+	ScrollView,
 	TouchableWithoutFeedback,
 	Keyboard,
 	KeyboardAvoidingView,
@@ -15,6 +16,7 @@ import {
 import Theme from "../constants/constants";
 import Soft from "../components/Soft";
 import { AppLoading } from "expo-app-loading";
+import * as Animatable from 'react-native-animatable';
 import { useFonts } from "expo-font";
 // import {useFonts,} from "@expo-google-fonts/raleway";
 import Header from "../components/Header";
@@ -109,17 +111,19 @@ const Register = (props, { navigation }) => {
 	};
 
 	return (
-	<KeyboardAvoidingView
+  <View style={styles.content}>
+	 <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior='padding'
        >
-		<TouchableWithoutFeedback
+		{/* <TouchableWithoutFeedback
 			onPress={() => {
 				Keyboard.dismiss();
 			}}
-		>
-			{/* <Header /> */}
-			<View style={styles.register}>
+		> */}
+		
+			<ScrollView style={styles.container} 
+			contentContainerStyle={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}
+			>
 				<Image
 					style={styles.registerVector}
 					source={require("../assets/register.jpg")}
@@ -267,19 +271,22 @@ const Register = (props, { navigation }) => {
 						Login
 					</Text>
 				</View>
-			</View>
-		</TouchableWithoutFeedback>
-	</KeyboardAvoidingView>
+			</ScrollView>
+		{/* </TouchableWithoutFeedback> */}
+	  </KeyboardAvoidingView>
+	</View>
 	);
 };
 
 const styles = StyleSheet.create({
-	register: {
-		flex: 1,
-		alignItems:'center',
-		justifyContent:'center'
+	content:{
+        flex:1,     		
+	 },
+	 container: {
+		// backgroundColor: 'red',
+		height: '100%',
+		width: '100%'
 	},
-
 	inputArea: {
 		justifyContent:'center',
 		height: 45,
