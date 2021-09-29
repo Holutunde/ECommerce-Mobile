@@ -13,6 +13,7 @@ import Theme from "./constants/constants";
 import AllProducts from "./screens/ProductsScreen";
 import { useFonts } from "expo-font";
 import UserDetail from "./screens/UserDetailScreen";
+import SplashScreen from "./screens/SplashScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -32,10 +33,13 @@ export default function App() {
 	return (
 		<NavigationContainer theme={MyTheme}>
 			<StatusBar style="auto" />
-			<Header />
-			<Stack.Navigator screenOptions={{ header: () => null }}>
+			<Stack.Navigator 
+			screenOptions={{
+               headerShown: false
+             }}>
+				<Stack.Screen name="Splash" component={SplashScreen}/>	
 				<Stack.Screen name="Login" component={Login} />
-				<Stack.Screen name="Register" component={Register} />
+				<Stack.Screen name="Register" component={Register}/>
 				<Stack.Screen name="UserDetail" component={UserDetail} />
 				<Stack.Screen name="Products" component={AllProducts} />
 			</Stack.Navigator>
