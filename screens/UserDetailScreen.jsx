@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Button, View, Text, Alert } from "react-native";
+import {
+	StyleSheet,
+	Button,
+	View,
+	Text,
+	Alert,
+	Image,
+	TouchableOpacity,
+} from "react-native";
 import { useFonts } from "@expo-google-fonts/raleway";
 import Theme from "../constants/constants";
 import * as SecureStore from "expo-secure-store";
+import Header from "../components/Header";
 import Soft from "../components/Soft";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -13,7 +22,7 @@ const UserDetail = (props, { navigation }) => {
 
 	const userInfourl = "https://ecomm-store-proj.herokuapp.com/api/v1/user";
 
-	const [fontLoaded, error] = useFonts({
+	const [fontLoaded] = useFonts({
 		Gem: require("../assets/fonts/GemunuLibre-VariableFont_wght.ttf"),
 		Itl: require("../assets/fonts/Italianno-Regular.ttf"),
 		El: require("../assets/fonts/ElMessiri-VariableFont_wght.ttf"),
@@ -23,16 +32,12 @@ const UserDetail = (props, { navigation }) => {
 		props.navigation.navigate("Login");
 	};
 
-	async function getStorageValue(key, defaultValue) {
-		let value = defaultValue;
+	const getStorageValue = async (key) => {
 		try {
-			const getToken = await AsyncStorage.getItem(key);
-			value = JSON.parse(getToken) || defaultValue;
-		} catch (e) {
-			alert(e);
-		} finally {
+			const data = await AsyncStorage.getItem(key);
+			parsedData = JSON.parse(data);
 			if (value.success == false) {
-				Alert.alert("Invalid Details", loginData.error, [
+				Alert.alert("Invalid Details", parsedData.error, [
 					{
 						text: "Cancel",
 						style: "default",
@@ -41,15 +46,16 @@ const UserDetail = (props, { navigation }) => {
 				]);
 				return;
 			} else {
-				setLoginData(value);
+				setLoginData(parsedData);
 				setUpdated(true);
-				getUser(loginData.access);
+				getUser(parsedData.access);
 			}
+		} catch (error) {
+			alert(error);
 		}
-	}
+	};
 
-	async function getUser(token) {
-		let user = { user_info: 'Empty', isLoading: 'false' }
+	const getUser = async (token) => {
 		try {
 			setUser({ user_info: [], isLoading: true });
 			const response = await fetch(userInfourl, {
@@ -61,44 +67,77 @@ const UserDetail = (props, { navigation }) => {
 				},
 			});
 			const data = await response.json();
+			setUser({ user_info: data.results, isLoading: false });
 		} catch (error) {
 			alert(error);
-		} finally {
-			setUser({ user_info: data.results, isLoading: false });
 		}
 	}
 
 	useEffect(() => {
 		getStorageValue("loginInfo", "Empty");
 	}, []);
-	
+
+	const sampleData = {
+		username: "Aina Emmanuel",
+		email: "ainae06@gmail.com",
+		img: `https://picsum.photos/${styles.img.width}`,
+		bio: 'I am a software developer with 1 week experience with backend engineering'
+	};
+
+	if (!fontLoaded) {
+		return null;
+	}
+
 	return (
-		<View style={styles.screen}>
-			<Soft style={styles.cardArea}>
-				<Text style={styles.text2}> ₦{"Hello"} </Text>
-				<Text style={styles.text2}> ₦{ user.user_info[0].email } </Text>	
-			</Soft>
+		<View style={styles.container}>
+			<Header />
+			<Image style={styles.img} source={{ uri: sampleData.img }} />
+			<Text style={styles.text2}> {`Welcome ${sampleData.username}!`} </Text>
+			<Text style={styles.bio}> {`${sampleData.bio}!`} </Text>
+			<Button color="black" style={{}} title="Edit Profile" />
+
+			<View
+				style={{
+					position: "absolute",
+					left: 0,
+					right: 0,
+					bottom: 0,
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				{/* <View> */}
+				<TouchableOpacity style={styles.roundButton2}>
+					<Text style={styles.footerText}>Joined September 2021</Text>
+				</TouchableOpacity>
+			</View>
+
+			{/* <Soft style={styles.cardArea}> */}
+			{/* <Text style={styles.text2}> {`Welcome ${sampleData.username}!`} </Text> */}
+			{/* <Text style={styles.text2}> ₦{user.user_info?.[0]?.email} </Text> */}
+			{/* </Soft> */}
 		</View>
 	);
 };
 
 const styles = StyleSheet.create({
-	login: {
+	container: {
 		flex: 1,
-		width: "90%",
-		margin: 10,
 		alignItems: "center",
-		justifyContent: "center",
-
-		// backgroundColor: 'blue',
+		marginTop: 50,
 	},
 
-	text: {
+	bio: {
 		fontSize: 20,
 		fontFamily: Theme.font,
 	},
+	footerText: {
+		fontSize: 15,
+		fontFamily: Theme.font,
+		color: 'grey',
+	},
 	text2: {
-		fontSize: 20,
+		fontSize: 30,
 		fontFamily: Theme.font,
 	},
 	cardArea: {
@@ -115,8 +154,21 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 	},
 	img: {
-		width: 86,
-		height: 78,
+		width: 200,
+		height: 200,
+		borderRadius: 400 / 2,
+		paddingTop: 30,
+		justifyContent: "center",
+	},
+	roundButton2: {
+		marginTop: 20,
+		width: 150,
+		height: 30,
+		justifyContent: "center",
+		alignItems: "center",
+		marginBottom: 10,
+		borderRadius: 20,
+		backgroundColor: "#cfcfcf",
 	},
 });
 
