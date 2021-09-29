@@ -31,7 +31,7 @@ const Login = (props, { navigation }) => {
 
 	const [isFocused, setFocused] = useState(false);
 
-	const [data, setData] = useState({
+	const [loginData, setLoginData] = useState({
 		email: "",
 		password: "",
 		check_textInputChange: false,
@@ -40,14 +40,14 @@ const Login = (props, { navigation }) => {
 
 	const textInputChange = (val) => {
 		if (val.length !== 0) {
-			setData({
-				...data,
+			setLoginData({
+				...loginData,
 				email: val,
 				check_textInputChange: true,
 			});
 		} else {
-			setData({
-				...data,
+			setLoginData({
+				...loginData,
 				email: val,
 				check_textInputChange: false,
 			});
@@ -55,16 +55,16 @@ const Login = (props, { navigation }) => {
 	};
 
 	const handlePasswordChange = (val) => {
-		setData({
-			...data,
+		setLoginData({
+			...loginData,
 			password: val,
 		});
 	};
 
 	const updateSecureTextEntry = () => {
-		setData({
-			...data,
-			secureTextEntry: !data.secureTextEntry,
+		setLoginData({
+			...loginData,
+			secureTextEntry: !loginData.secureTextEntry,
 		});
 	};
 	const notRegistered = () => {
@@ -78,8 +78,8 @@ const Login = (props, { navigation }) => {
 		"https://ecomm-store-proj.herokuapp.com/api/v1/account/login";
 
 	const performLogin = async () => {
-		const email = data.email;
-		const password = data.password;
+		const email = loginData.email;
+		const password = loginData.password;
 		const details = { email, password };
 		const response = await fetch(loginUrl, {
 			method: "POST",
@@ -90,15 +90,15 @@ const Login = (props, { navigation }) => {
 			},
 		});
 
-		const loginData = await response.json();
-		saveToken(loginData);
+		const loginLoginData = await response.json();
+		saveToken(loginLoginData);
 		toUserDetail();
 	};
 
-	const saveToken = async (data) => {
+	const saveToken = async (loginData) => {
 		try {
-			const jsonData = JSON.stringify(data);
-			await AsyncStorage.setItem("loginInfo", jsonData);
+			const jsonLoginData = JSON.stringify(loginData);
+			await AsyncStorage.setItem("loginInfo", jsonLoginData);
 		} catch (error) {
 			alert(error);
 		}
@@ -144,7 +144,7 @@ const Login = (props, { navigation }) => {
 							autoCapitalize="none"
 							onChangeText={(val) => textInputChange(val)}
 						/>
-						{data.check_textInputChange ? (
+						{loginData.check_textInputChange ? (
 							<Animatable.View animation="bounceIn">
 								<Feather name="check-circle" color="green" size={20} />
 							</Animatable.View>
@@ -155,13 +155,13 @@ const Login = (props, { navigation }) => {
 						<Feather name="lock" color="#05375a" size={20} />
 						<TextInput
 							placeholder="********"
-							secureTextEntry={data.secureTextEntry ? true : false}
+							secureTextEntry={loginData.secureTextEntry ? true : false}
 							style={styles.textInput}
 							autoCapitalize="none"
 							onChangeText={(val) => handlePasswordChange(val)}
 						/>
 						<TouchableOpacity onPress={updateSecureTextEntry}>
-							{data.secureTextEntry ? (
+							{loginData.secureTextEntry ? (
 								<Feather name="eye-off" color="grey" size={20} />
 							) : (
 								<Feather name="eye" color="grey" size={20} />
