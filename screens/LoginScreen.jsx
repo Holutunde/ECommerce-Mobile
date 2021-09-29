@@ -78,7 +78,6 @@ const Login = (props, { navigation }) => {
 	const loginUrl =
 		"https://ecomm-store-proj.herokuapp.com/api/v1/account/login";
 
-	var datas;
 	const performLogin = async () => {
 		const details = { email, password };
 		const response = await fetch(loginUrl, {
@@ -118,101 +117,69 @@ const Login = (props, { navigation }) => {
 	}
 
 	return (
-		<KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior='padding'
-       >
-		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-			<View style={styles.container}>
+		<KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+				<View style={styles.container}>
+					<Image
+						style={styles.loginVector}
+						source={require("../pictures/login.jpg")}
+					/>
 
-				<Image
-					style={styles.loginVector}
-					source={require("../pictures/login.jpg")}
-				/>
+					<View style={styles.action}>
+						<FontAwesome name="user-o" color="#05375a" size={20} />
+						<TextInput
+							onFocus={() => setFocused(true)}
+							placeholder="Username"
+							style={styles.textInput}
+							autoCapitalize="none"
+							onChangeText={(val) => textInputChange(val)}
+						/>
+						{data.check_textInputChange ? (
+							<Animatable.View animation="bounceIn">
+								<Feather name="check-circle" color="green" size={20} />
+							</Animatable.View>
+						) : null}
+					</View>
 
-               <View style={styles.action}>
-                <FontAwesome 
-                    name="user-o"
-                    color="#05375a"
-                    size={20}
-                />
-                <TextInput 
-				    onFocus={() => setFocused(true)}
-                    placeholder="Username"
-                    style={styles.textInput}
-                    autoCapitalize="none"
-                    onChangeText={(val) => textInputChange(val)}
-                />
-                {data.check_textInputChange ? 
-                <Animatable.View
-                    animation="bounceIn"
-                >
-                    <Feather 
-                        name="check-circle"
-                        color="green"
-                        size={20}
-                    />
-                </Animatable.View>
-                : null}
-            </View>
-    
-				<View style={styles.action}>
-                <Feather 
-                    name="lock"
-                    color="#05375a"
-                    size={20}
-                />
-                <TextInput 
-                    placeholder="Password"
-                    secureTextEntry={data.secureTextEntry ? true : false}
-                    style={styles.textInput}
-                    autoCapitalize="none"
-                    onChangeText={(val) => handlePasswordChange(val)}
-                />
-                <TouchableOpacity
-                    onPress={updateSecureTextEntry}
-                >
-                    {data.secureTextEntry ? 
-                    <Feather 
-                        name="eye-off"
-                        color="grey"
-                        size={20}
-                    />
-                    :
-                    <Feather 
-                        name="eye"
-                        color="grey"
-                        size={20}
-                    />
-                    }
-                </TouchableOpacity>
-            </View>
-		
-              
-				<TouchableOpacity
-                    onPress={Registered}
-                    style={styles.signIn}
-                >
-                    <Text style={styles.textSign}>Log in</Text>
-                </TouchableOpacity>
-				<View style={styles.toRegister}>
-					<Text style={{ fontSize: 20, fontFamily: Theme.font }}>
-						Don't have an account?
-					</Text>
-					<Text
-						style={{
-							color: Theme.primary,
-							fontSize: 20,
-							fontFamily: Theme.font,
-						    paddingLeft:10
-						}}
-						onPress={notRegistered}
-					>
-						Sign up
-					</Text>
+					<View style={styles.action}>
+						<Feather name="lock" color="#05375a" size={20} />
+						<TextInput
+							placeholder="Password"
+							secureTextEntry={data.secureTextEntry ? true : false}
+							style={styles.textInput}
+							autoCapitalize="none"
+							onChangeText={(val) => handlePasswordChange(val)}
+						/>
+						<TouchableOpacity onPress={updateSecureTextEntry}>
+							{data.secureTextEntry ? (
+								<Feather name="eye-off" color="grey" size={20} />
+							) : (
+								<Feather name="eye" color="grey" size={20} />
+							)}
+						</TouchableOpacity>
+					</View>
+
+					<TouchableOpacity onPress={performLogin} style={styles.signIn}>
+						<Text style={styles.textSign}>Log in</Text>
+					</TouchableOpacity>
+					<View style={styles.toRegister}>
+						<Text style={{ fontSize: 20, fontFamily: Theme.font }}>
+							Don't have an account?
+						</Text>
+						<Text
+							style={{
+								color: Theme.primary,
+								fontSize: 20,
+								fontFamily: Theme.font,
+								paddingLeft: 10,
+							}}
+							onPress={notRegistered}
+						>
+							Sign up
+						</Text>
+					</View>
 				</View>
-			</View>
-		 </TouchableWithoutFeedback>
+			</TouchableWithoutFeedback>
 		</KeyboardAvoidingView>
 	);
 };
