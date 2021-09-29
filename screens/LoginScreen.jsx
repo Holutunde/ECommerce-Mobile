@@ -18,8 +18,11 @@ import Theme from "../constants/constants";
 import Soft from "../components/Soft";
 import { useFonts } from "@expo-google-fonts/raleway";
 import * as SecureStore from "expo-secure-store";
+
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 const Login = (props, { navigation }) => {
 	let [fontLoaded] = useFonts({
@@ -87,17 +90,29 @@ const Login = (props, { navigation }) => {
 			},
 		});
 
-		var datas = await response.json();
-		if (datas.access) {
-			let token = datas.access;
-			await SecureStore.setItemAsync("token", token);
-		} else {
-			await SecureStore.setItemAsync("token", datas.error);
-		}
-
-		props.navigation.navigate("UserDetail");
+		const data = await response.json();
+		await saveToken(data);
+		toUserDetail();
 	};
 
+	const saveToken = async (data) => {
+		try {
+			const jsonData = JSON.stringify(data);
+			await AsyncStorage.setItem("loginInfo", jsonData);
+			console.log("Data Saved Successfully!")
+		} catch (error) {
+			alert(error)
+			console.log("Data Saved Successfully!");
+		}
+	};
+
+	const toProducts = () => {
+		props.navigation.navigate("Products");
+	};
+
+	const toUserDetail = () => {
+		props.navigation.navigate("UserDetail");
+	}
 	if (!fontLoaded) {
 		return null;
 	}
