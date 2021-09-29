@@ -9,6 +9,7 @@ import {
 	Keyboard,
 	TouchableWithoutFeedback,
 	FlatList,
+	ActivityIndicator
 } from "react-native";
 import Theme from "../constants/constants";
 import Header from "../components/Header";
@@ -56,8 +57,9 @@ const AllProducts = (props) => {
 
 	if (products.isLoading) {
 		return (
-			<Text>Loading...</Text>
-			// <AppLoading />
+			<View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+				<ActivityIndicator size='large' />
+			</View>
 		)
 	};
 	return (
