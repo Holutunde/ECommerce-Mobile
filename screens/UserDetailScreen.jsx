@@ -4,13 +4,14 @@ import { useFonts } from "@expo-google-fonts/raleway";
 import Theme from "../constants/constants";
 import * as SecureStore from "expo-secure-store";
 import Soft from "../components/Soft";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UserDetail = (props, { navigation }) => {
-	const [loginToken, setLoginToken] = useState("Empty");
+	let [loginData, setLoginData] = useState({});
+	const [updated, setUpdated] = useState(false);
 	const [user, setUser] = useState({ user_info: [], isLoading: false });
 
-	const userInfourl =
-		"https://ecomm-store-proj.herokuapp.com/api/v1/account/user";
+	const userInfourl = "https://ecomm-store-proj.herokuapp.com/api/v1/user";
 
 	const [fontLoaded, error] = useFonts({
 		Gem: require("../assets/fonts/GemunuLibre-VariableFont_wght.ttf"),
@@ -22,68 +23,59 @@ const UserDetail = (props, { navigation }) => {
 		props.navigation.navigate("Login");
 	};
 
-	const validateToken = () => {
-		let token = SecureStore.getItemAsync("token");
-		console.log(token);
-		if (token.length == 255) {
-			console.log(`Saved ${token}`);
-			setLoginToken(token);
-			getUser();
-		} else {
-			console.log(`Not saved ${token}`);
-			Alert.alert("Invalid", "Invalid Email or Password", [
-				{
-					text: "Cancel",
-					style: "default",
-					onPress: backToLogin,
-				},
-			]);
-			return;
+	async function getStorageValue(key, defaultValue) {
+		let value = defaultValue;
+		try {
+			value = JSON.parse(await AsyncStorage.getItem(key)) || defaultValue;
+		} catch (e) {
+			alert(e);
+		} finally {
+			if (value.success == false) {
+				Alert.alert("Invalid Details", loginData.error, [
+					{
+						text: "Cancel",
+						style: "default",
+						onPress: backToLogin,
+					},
+				]);
+				return;
+			} else {
+				setLoginData(value);
+				setUpdated(true);
+				getUser(loginData.access);
+			}
 		}
-	};
+	}
 
+	async function getUser(token) {
+		let user = { user_info: 'Empty', isLoading: 'false' }
+		console.log("The token", token)
+		try {
+			setUser({ user_info: [], isLoading: true });
+			const response = await fetch(userInfourl, {
+				method: "GET",
+				headers: {
+					"Content-type": "application/json",
+					Accept: "application/json",
+					Authorization: "Bearer " + token,
+				},
+			});
+			const data = await response.json();
+		} catch (error) {
+			alert(error);
+		} finally {
+			setUser({ user_info: data.results, isLoading: false });
+		}
+	}
 	useEffect(() => {
-		validateToken();
-		console.log("USESTATE CALLED");
-	}, []);
-
-	const getUser = async () => {
-		setUser({ user_info: [], isLoading: true });
-		const response = await fetch(userInfourl, {
-			method: "GET",
-			headers: {
-				"Content-type": "application/json",
-				Accept: "application/json",
-				Authorization: "Bearer " + loginToken,
-			},
-		});
-		const data = await response.json();
-		console.log(data);
-		setUser({ user_info: data.results, isLoading: false });
-	};
-
-	if (user.isLoading) {
-		return <Text>Loading...</Text>;
-	}
-
-	if (user.user_info == undefined) {
-		Alert.alert(loginToken, loginToken, [
-			{
-				text: "Cancel",
-				style: "default",
-				onPress: props.navigation.navigate("Login"),
-			},
-		]);
-		return;
-	}
-
+		getStorageValue("loginInfo", "Empty");
+	}),
+		[updated];
 	return (
 		<View style={styles.screen}>
 			<Soft style={styles.cardArea}>
-				{/* <Image style={styles.img} source={{ uri: all_items.username }} /> */}
-				{console.log(loginToken)}
-				<Text style={styles.text2}> {user.user_info[0].email} </Text>
-				<Text style={styles.text2}> ₦{user.user_info[0].username} </Text>
+				<Text style={styles.text2}> ₦{"Hello"} </Text>
+				<Text style={styles.text2}> ₦{ user.user_info[0].email } </Text>	
 			</Soft>
 		</View>
 	);
