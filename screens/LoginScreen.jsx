@@ -6,19 +6,19 @@ import {
 	Text,
 	Image,
 	Keyboard,
-	Animatable,
 	KeyboardAvoidingView,
 	TouchableWithoutFeedback,
 	Alert,
-	TouchableOpacity
+	ScrollView,
+	TouchableOpacity,
+	Platform
 } from "react-native";
 
 import Theme from "../constants/constants";
-
 import Soft from "../components/Soft";
 import { useFonts } from "@expo-google-fonts/raleway";
 import * as SecureStore from "expo-secure-store";
-
+import * as Animatable from 'react-native-animatable';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -33,7 +33,7 @@ const Login = (props, { navigation }) => {
 	const [isFocused, setFocused] = useState(false)
 
     const [data, setData] = useState({
-        username: '',
+        email: '',
         password: '',
         check_textInputChange: false,
         secureTextEntry: true,
@@ -43,13 +43,13 @@ const Login = (props, { navigation }) => {
         if( val.length !== 0 ) {
             setData({
                 ...data,
-                username: val,
+                email: val,
                 check_textInputChange: true
             });
         } else {
             setData({
                 ...data,
-                username: val,
+                email: val,
                 check_textInputChange: false
             });
         }
@@ -117,9 +117,13 @@ const Login = (props, { navigation }) => {
 	}
 
 	return (
-		<KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
-			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-				<View style={styles.container}>
+	  <View style ={styles.content} >
+		<KeyboardAvoidingView 
+		style ={{ flex :1}}
+		 behavior={Platform.OS === 'ios' ? 'padding' : null}
+		>
+			{/* <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}> */}
+				<ScrollView style={styles.container} contentContainerStyle={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>
 					<Image
 						style={styles.loginVector}
 						source={require("../pictures/login.jpg")}
@@ -129,7 +133,7 @@ const Login = (props, { navigation }) => {
 						<FontAwesome name="user-o" color="#05375a" size={20} />
 						<TextInput
 							onFocus={() => setFocused(true)}
-							placeholder="Username"
+							placeholder="Email"
 							style={styles.textInput}
 							autoCapitalize="none"
 							onChangeText={(val) => textInputChange(val)}
@@ -144,7 +148,7 @@ const Login = (props, { navigation }) => {
 					<View style={styles.action}>
 						<Feather name="lock" color="#05375a" size={20} />
 						<TextInput
-							placeholder="Password"
+							placeholder="********"
 							secureTextEntry={data.secureTextEntry ? true : false}
 							style={styles.textInput}
 							autoCapitalize="none"
@@ -178,17 +182,22 @@ const Login = (props, { navigation }) => {
 							Sign up
 						</Text>
 					</View>
-				</View>
-			</TouchableWithoutFeedback>
+				</ScrollView>
+			{/* </TouchableWithoutFeedback> */}
 		</KeyboardAvoidingView>
+	  </View>
 	);
 };
-
+  
 const styles = StyleSheet.create({
+	 content:{
+        flex:1,     
+		
+	 },
 	 container: {
-		flex: 1,
-		alignItems:'center',
-		marginTop:100
+		// backgroundColor: 'red',
+		height: '100%',
+		width: '100%'
 	},
 	inputArea: {
 		justifyContent:'center',
