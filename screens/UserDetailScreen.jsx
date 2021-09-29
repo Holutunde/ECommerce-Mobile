@@ -26,7 +26,8 @@ const UserDetail = (props, { navigation }) => {
 	async function getStorageValue(key, defaultValue) {
 		let value = defaultValue;
 		try {
-			value = JSON.parse(await AsyncStorage.getItem(key)) || defaultValue;
+			const getToken = await AsyncStorage.getItem(key);
+			value = JSON.parse(getToken) || defaultValue;
 		} catch (e) {
 			alert(e);
 		} finally {
@@ -49,7 +50,6 @@ const UserDetail = (props, { navigation }) => {
 
 	async function getUser(token) {
 		let user = { user_info: 'Empty', isLoading: 'false' }
-		console.log("The token", token)
 		try {
 			setUser({ user_info: [], isLoading: true });
 			const response = await fetch(userInfourl, {
@@ -67,10 +67,11 @@ const UserDetail = (props, { navigation }) => {
 			setUser({ user_info: data.results, isLoading: false });
 		}
 	}
+
 	useEffect(() => {
 		getStorageValue("loginInfo", "Empty");
-	}),
-		[updated];
+	}, []);
+	
 	return (
 		<View style={styles.screen}>
 			<Soft style={styles.cardArea}>
