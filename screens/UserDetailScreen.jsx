@@ -36,7 +36,7 @@ const UserDetail = (props, { navigation }) => {
 		try {
 			const data = await AsyncStorage.getItem(key);
 			parsedData = JSON.parse(data);
-			if (value.success == false) {
+			if (parsedData.success == false) {
 				Alert.alert("Invalid Details", parsedData.error, [
 					{
 						text: "Cancel",
@@ -74,7 +74,7 @@ const UserDetail = (props, { navigation }) => {
 	};
 
 	useEffect(() => {
-		getStorageValue("loginInfo", "Empty");
+		getStorageValue("loginInfo");
 	}, []);
 
 	const sampleData = {
@@ -90,12 +90,11 @@ const UserDetail = (props, { navigation }) => {
 
 	return (
 		<View style={styles.container}>
-			<Header />
 			<Image style={styles.img} source={{ uri: sampleData.img }} />
 			<Text style={styles.text2}>
-				{`Welcome ${user.user_info[0].username}!`}
+				{"Welcome", user.user_info?.[0]?.username }
 			</Text>
-			<Text style={styles.bio}> {`${user.user_info[0].gender}!`} </Text>
+			<Text style={styles.bio}> { user.user_info?.[0]?.gender } </Text>
 			<Button color="black" style={{}} title="Edit Profile" />
 
 			<View
