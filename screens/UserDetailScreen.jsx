@@ -71,7 +71,7 @@ const UserDetail = (props, { navigation }) => {
 		} catch (error) {
 			alert(error);
 		}
-	}
+	};
 
 	useEffect(() => {
 		getStorageValue("loginInfo", "Empty");
@@ -81,7 +81,7 @@ const UserDetail = (props, { navigation }) => {
 		username: "Aina Emmanuel",
 		email: "ainae06@gmail.com",
 		img: `https://picsum.photos/${styles.img.width}`,
-		bio: 'I am a software developer with 1 week experience with backend engineering'
+		bio: "I am a software developer with 1 week experience with backend engineering",
 	};
 
 	if (!fontLoaded) {
@@ -92,8 +92,10 @@ const UserDetail = (props, { navigation }) => {
 		<View style={styles.container}>
 			<Header />
 			<Image style={styles.img} source={{ uri: sampleData.img }} />
-			<Text style={styles.text2}> {`Welcome ${sampleData.username}!`} </Text>
-			<Text style={styles.bio}> {`${sampleData.bio}!`} </Text>
+			<Text style={styles.text2}>
+				{`Welcome ${user.user_info[0].username}!`}
+			</Text>
+			<Text style={styles.bio}> {`${user.user_info[0].gender}!`} </Text>
 			<Button color="black" style={{}} title="Edit Profile" />
 
 			<View
@@ -134,7 +136,7 @@ const styles = StyleSheet.create({
 	footerText: {
 		fontSize: 15,
 		fontFamily: Theme.font,
-		color: 'grey',
+		color: "grey",
 	},
 	text2: {
 		fontSize: 30,
