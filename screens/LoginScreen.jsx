@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import {
 	StyleSheet,
-	Button,
 	View,
 	TextInput,
 	Text,
 	Image,
 	Keyboard,
+	Animatable,
+	KeyboardAvoidingView,
 	TouchableWithoutFeedback,
 	Alert,
+	TouchableOpacity
 } from "react-native";
 
 import Theme from "../constants/constants";
@@ -16,7 +18,8 @@ import Theme from "../constants/constants";
 import Soft from "../components/Soft";
 import { useFonts } from "@expo-google-fonts/raleway";
 import * as SecureStore from "expo-secure-store";
-import UserDetail from "./UserDetailScreen";
+import Feather from 'react-native-vector-icons/Feather';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const Login = (props, { navigation }) => {
 	let [fontLoaded] = useFonts({
@@ -24,23 +27,55 @@ const Login = (props, { navigation }) => {
 		Gem: require("../assets/fonts/GemunuLibre-VariableFont_wght.ttf"),
 	});
 
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
+	const [isFocused, setFocused] = useState(false)
 
-	const inputEmailHandler = (enteredEmail) => {
-		setEmail(enteredEmail);
-	};
-	const inputPasswordHandler = (enteredPassword) => {
-		setPassword(enteredPassword);
-	};
+    const [data, setData] = useState({
+        username: '',
+        password: '',
+        check_textInputChange: false,
+        secureTextEntry: true,
+    });
+
+	const textInputChange = (val) => {
+        if( val.length !== 0 ) {
+            setData({
+                ...data,
+                username: val,
+                check_textInputChange: true
+            });
+        } else {
+            setData({
+                ...data,
+                username: val,
+                check_textInputChange: false
+            });
+        }
+    }
+
+    const handlePasswordChange = (val) => {
+        setData({
+            ...data,
+            password: val
+        });
+    }
+
+	const updateSecureTextEntry = () => {
+        setData({
+            ...data,
+            secureTextEntry: !data.secureTextEntry
+        });
+    }
 	const notRegistered = () => {
 		props.navigation.navigate("Register");
 	};
 
+	const Registered = () => {
+		props.navigation.navigate("Products");
+	};
 	const loginUrl =
 		"https://ecomm-store-proj.herokuapp.com/api/v1/account/login";
 
-	var data;
+	var datas;
 	const performLogin = async () => {
 		const details = { email, password };
 		const response = await fetch(loginUrl, {
@@ -52,19 +87,15 @@ const Login = (props, { navigation }) => {
 			},
 		});
 
-		var data = await response.json();
-		if (data.access) {
-			let token = data.access;
+		var datas = await response.json();
+		if (datas.access) {
+			let token = datas.access;
 			await SecureStore.setItemAsync("token", token);
 		} else {
-			await SecureStore.setItemAsync("token", data.error);
+			await SecureStore.setItemAsync("token", datas.error);
 		}
 
 		props.navigation.navigate("UserDetail");
-	};
-
-	const toProducts = () => {
-		props.navigation.navigate("Products");
 	};
 
 	if (!fontLoaded) {
@@ -72,75 +103,121 @@ const Login = (props, { navigation }) => {
 	}
 
 	return (
+		<KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior='padding'
+       >
 		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-			<View style={styles.login}>
-				<Text style={{ fontSize: 20, fontFamily: Theme.font }}>
-					Login to your Account{" "}
-				</Text>
+			<View style={styles.container}>
 
 				<Image
 					style={styles.loginVector}
-					source={require("../assets/login.jpg")}
+					source={require("../pictures/login.jpg")}
 				/>
 
-				<Soft style={styles.inputArea}>
-					<TextInput
-						style={styles.textInput}
-						placeholder="Email"
-						onChangeText={inputEmailHandler}
-						value={email}
-					/>
-				</Soft>
-
-				<Soft style={styles.inputArea}>
-					<TextInput
-						style={styles.textInput}
-						placeholder="Password"
-						onChangeText={inputPasswordHandler}
-						value={password}
-					/>
-				</Soft>
-
-				<Button title="Login" color={Theme.primary} onPress={performLogin} />
+               <View style={styles.action}>
+                <FontAwesome 
+                    name="user-o"
+                    color="#05375a"
+                    size={20}
+                />
+                <TextInput 
+				    onFocus={() => setFocused(true)}
+                    placeholder="Username"
+                    style={styles.textInput}
+                    autoCapitalize="none"
+                    onChangeText={(val) => textInputChange(val)}
+                />
+                {data.check_textInputChange ? 
+                <Animatable.View
+                    animation="bounceIn"
+                >
+                    <Feather 
+                        name="check-circle"
+                        color="green"
+                        size={20}
+                    />
+                </Animatable.View>
+                : null}
+            </View>
+    
+				<View style={styles.action}>
+                <Feather 
+                    name="lock"
+                    color="#05375a"
+                    size={20}
+                />
+                <TextInput 
+                    placeholder="Password"
+                    secureTextEntry={data.secureTextEntry ? true : false}
+                    style={styles.textInput}
+                    autoCapitalize="none"
+                    onChangeText={(val) => handlePasswordChange(val)}
+                />
+                <TouchableOpacity
+                    onPress={updateSecureTextEntry}
+                >
+                    {data.secureTextEntry ? 
+                    <Feather 
+                        name="eye-off"
+                        color="grey"
+                        size={20}
+                    />
+                    :
+                    <Feather 
+                        name="eye"
+                        color="grey"
+                        size={20}
+                    />
+                    }
+                </TouchableOpacity>
+            </View>
+		
+              
+				<TouchableOpacity
+                    onPress={Registered}
+                    style={styles.signIn}
+                >
+                    <Text style={styles.textSign}>Log in</Text>
+                </TouchableOpacity>
 				<View style={styles.toRegister}>
 					<Text style={{ fontSize: 20, fontFamily: Theme.font }}>
-						{" "}
-						Don't have an account?{" "}
+						Don't have an account?
 					</Text>
 					<Text
 						style={{
 							color: Theme.primary,
 							fontSize: 20,
 							fontFamily: Theme.font,
+						    paddingLeft:10
 						}}
 						onPress={notRegistered}
 					>
-						SignUp
+						Sign up
 					</Text>
 				</View>
 			</View>
-		</TouchableWithoutFeedback>
+		 </TouchableWithoutFeedback>
+		</KeyboardAvoidingView>
 	);
 };
 
 const styles = StyleSheet.create({
-	login: {
+	 container: {
 		flex: 1,
-		width: "90%",
-		margin: 10,
-		alignItems: "center",
-		// backgroundColor: 'blue',
+		alignItems:'center',
+		marginTop:100
 	},
-
 	inputArea: {
+		justifyContent:'center',
 		height: 45,
-		width: "100%",
-		paddingLeft: 20,
-		alignItems: "flex-start",
+		width: "85%",
+	    marginBottom:20
 	},
 	textInput: {
 		width: "100%",
 		fontSize: 15,
+		paddingStart: 10
 	},
 	loginVector: {
 		width: 300,
@@ -150,6 +227,40 @@ const styles = StyleSheet.create({
 		padding: 20,
 		flexDirection: "row",
 	},
+	signIn:{
+		backgroundColor: "#8EA2FF",
+		borderWidth:1,
+	    width: '90%',
+	    height: 45,
+		marginTop:20,
+	    justifyContent: 'center',
+	    alignItems: 'center',
+     	borderRadius: 10,
+    },
+    textSign: {
+ 	   fontSize: 18,
+	   fontWeight: 'bold',
+	   justifyContent:'center',
+	   alignItems:'center',
+	   color:'grey'
+   },
+   action: { 
+      flexDirection: 'row',
+	  marginTop:20,
+      height:45,
+	  width:'90%',
+	  borderWidth: 1,
+	  borderColor: '#f2f2f2',
+	  paddingBottom: 6,
+	  alignItems:'center',
+	  paddingHorizontal:5,
+	  borderRadius:10
+    },
+   textInput: {
+	  width:"88%",
+	  paddingLeft: 10,
+      color: '#05375a',
+    },
 });
 
 export default Login;
