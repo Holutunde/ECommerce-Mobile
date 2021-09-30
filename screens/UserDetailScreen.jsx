@@ -13,7 +13,7 @@ import Theme from "../constants/constants";
 import * as SecureStore from "expo-secure-store";
 import Header from "../components/Header";
 import Soft from "../components/Soft";
-import AsyncStorage from "@react-native-async-storage/async-storage
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const UserDetail = (props, { navigation }) => {
 	let [loginData, setLoginData] = useState({});
 	const [updated, setUpdated] = useState(false);

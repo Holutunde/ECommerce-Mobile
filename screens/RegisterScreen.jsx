@@ -38,6 +38,7 @@ const Register = (props, { navigation }) => {
 		check_textInputChange: false,
 		secureTextEntry: true,
 	});
+	const [isLoading, setIsLoading] = useState(true);
 
  
 	const [ sex ] = useState(
@@ -94,6 +95,7 @@ const Register = (props, { navigation }) => {
 	};
 
 	const performSignup = async () => {
+		setIsLoading(true);
 		const signupUrl =
 			"https://ecomm-store-proj.herokuapp.com/api/v1/account/signup";
 		console.log('User Data',userData)
@@ -116,14 +118,22 @@ const Register = (props, { navigation }) => {
 
 		const registrationRes = await response.json();
 		console.log(registrationRes);
-		// history.push("/");
+		setIsLoading(false);
 		props.navigation.navigate("Login");
 	};
 
 	const alreadyRegistered = () => {
 		props.navigation.navigate("Login");
 	};
-   
+
+	if (userData.isLoading == true) {
+		return (
+			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+				<ActivityIndicator size="large" color={Theme.primary} />
+			</View>
+		);
+	}
+
 	return (
 		<KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
 			<TouchableWithoutFeedback
