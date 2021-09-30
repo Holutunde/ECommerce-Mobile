@@ -88,14 +88,7 @@ const UserDetail = (props, { navigation }) => {
 	if (!fontLoaded) {
 		return null;
 	}
-
-<<<<<<< HEAD
-	return (
-		<View style={styles.container}>
-			<Image style={styles.img} source={{ uri: sampleData.img }} />
-			<Text style={styles.text2}>
-				{"Welcome", user.user_info?.[0]?.username }
-=======
+	
 	if (user.isLoading == true) {
 		return (
 			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -125,7 +118,6 @@ const UserDetail = (props, { navigation }) => {
 			</View>
 			<Text style={styles.text2}>
 				Welcome, {user.user_info?.[0]?.username}
->>>>>>> c3085ac... loading, pagination removed, user image
 			</Text>
 			<Text style={styles.bio}> { user.user_info?.[0]?.gender } </Text>
 			<Button color="black" style={{}} title="Edit Profile" />
