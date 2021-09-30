@@ -21,6 +21,7 @@ import Header from "../components/Header";
 import Feather from "react-native-vector-icons/Feather";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import * as Animatable from "react-native-animatable";
+import {Picker} from '@react-native-picker/picker';
 
 const Register = (props, { navigation }) => {
 	const [fontLoaded, error] = useFonts({
@@ -33,12 +34,23 @@ const Register = (props, { navigation }) => {
 		email: "",
 		username: "",
 		password: "",
-		confirm_password: "",
-		gender: 'Male',
+		gender:"Male",
 		check_textInputChange: false,
 		secureTextEntry: true,
-		confirm_secureTextEntry: true,
 	});
+
+ 
+	const [ sex ] = useState(
+		["Male","Female","Others"].sort());
+
+	
+	const handlePickerChange = (val) => {		
+			setUserData({
+				...userData,
+				gender: val,
+			});
+	
+	};
 
 	const textInputChange = (val) => {
 		if (val.length !== 0) {
@@ -50,14 +62,15 @@ const Register = (props, { navigation }) => {
 		};
 	}
 
-	const textEmailChange = (val) => {
-		
+	const textEmailChange = (val) => {		
 			setUserData({
 				...userData,
 				email: val,
 			});
 	
 	};
+
+
 
 	const handlePasswordChange = (val) => {
 		setUserData({
@@ -77,13 +90,6 @@ const Register = (props, { navigation }) => {
 		setUserData({
 			...userData,
 			secureTextEntry: !userData.secureTextEntry,
-		});
-	};
-
-	const updateConfirmSecureTextEntry = () => {
-		setUserData({
-			...userData,
-			confirm_secureTextEntry: !userData.confirm_secureTextEntry,
 		});
 	};
 
@@ -117,7 +123,7 @@ const Register = (props, { navigation }) => {
 	const alreadyRegistered = () => {
 		props.navigation.navigate("Login");
 	};
-
+   
 	return (
 		<KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
 			<TouchableWithoutFeedback
@@ -125,7 +131,6 @@ const Register = (props, { navigation }) => {
 					Keyboard.dismiss();
 				}}
 			>
-				{/* <Header /> */}
 				<View style={styles.register}>
 					<Image
 						style={styles.registerVector}
@@ -180,26 +185,32 @@ const Register = (props, { navigation }) => {
 								<Feather name="eye" color="grey" size={20} />
 							)}
 						</TouchableOpacity>
-					</View>
+					 </View>
+			
 
-					<View style={styles.action}>
-						<Feather name="lock" color="#05375a" size={20} />
-						<TextInput
-							placeholder="Confirm Your Password"
-							secureTextEntry={userData.confirm_secureTextEntry ? true : false}
-							style={styles.textInput}
-							autoCapitalize="none"
-							onChangeText={(val) => handleConfirmPasswordChange(val)}
-						/>
-						<TouchableOpacity onPress={updateConfirmSecureTextEntry}>
-							{userData.secureTextEntry ? (
-								<Feather name="eye-off" color="grey" size={20} />
-							) : (
-								<Feather name="eye" color="grey" size={20} />
-							)}
-						</TouchableOpacity>
-					</View>
+					<View style={styles.gender}>
+						<Text style={styles.pickerText}>
+                           Gender:
+						</Text>
+						<View style={styles.pickerBox}>
+					   <Picker
+					    style={styles.picker}
+						selectedValue = {userData.gender}
+						onValueChange = {(itemValue) => {handlePickerChange(itemValue)}}
+						>
+						{
+						  sex.map((item) => (
+							<Picker.Item 
+							  key={item}
+							  label = {item} 
+							  value = {item}/>
+						  ))
+						}
 
+					   </Picker>
+					   </View>
+					</View>
+                		
 					<TouchableOpacity onPress={performSignup} style={styles.signIn}>
 						<Text style={styles.textSign}>Sign up</Text>
 					</TouchableOpacity>
@@ -225,6 +236,7 @@ const Register = (props, { navigation }) => {
 							Login
 						</Text>
 					</View>
+					
 				</View>
 			</TouchableWithoutFeedback>
 		</KeyboardAvoidingView>
@@ -234,10 +246,9 @@ const Register = (props, { navigation }) => {
 const styles = StyleSheet.create({
 	register: {
 		flex: 1,
-		alignItems: "center",
-		justifyContent: "center",
+		justifyContent:'center',
+		alignItems:'center'
 	},
-
 	inputArea: {
 		justifyContent: "center",
 		height: 45,
@@ -247,6 +258,7 @@ const styles = StyleSheet.create({
 	registerVector: {
 		width: 300,
 		height: 300,
+	
 	},
 
 	toLogin: {
@@ -271,6 +283,7 @@ const styles = StyleSheet.create({
 		height: 45,
 		marginTop: 20,
 		justifyContent: "center",
+		borderColor: "#f2f2f2",
 		alignItems: "center",
 		borderRadius: 10,
 	},
@@ -298,6 +311,26 @@ const styles = StyleSheet.create({
 		paddingLeft: 10,
 		color: "#05375a",
 	},
+	gender:{
+       flexDirection:'row',
+	   marginTop:30
+	},
+	picker:{
+		width: 150,
+		height:30
+	},
+	pickerBox:{
+		borderWidth: 1,
+		borderColor: "#f2f2f2",
+		paddingBottom: 6,
+		alignItems: "center",
+		paddingHorizontal: 5,
+		borderRadius: 10,
+	},
+	pickerText:{
+       paddingRight:20,
+	   paddingTop:10
+	}
 });
 
 export default Register;

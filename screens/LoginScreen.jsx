@@ -121,7 +121,7 @@ const Login = (props, { navigation }) => {
 				style={{ flex: 1 }}
 				behavior={Platform.OS === "ios" ? "padding" : null}
 			>
-				{/* <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}> */}
+				<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
 				<ScrollView
 					style={styles.container}
 					contentContainerStyle={{
@@ -189,7 +189,7 @@ const Login = (props, { navigation }) => {
 						</Text>
 					</View>
 				</ScrollView>
-				{/* </TouchableWithoutFeedback> */}
+				</TouchableWithoutFeedback>
 			</KeyboardAvoidingView>
 		</View>
 	);

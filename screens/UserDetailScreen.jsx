@@ -7,15 +7,13 @@ import {
 	Alert,
 	Image,
 	TouchableOpacity,
-	ActivityIndicator,
 } from "react-native";
 import { useFonts } from "@expo-google-fonts/raleway";
 import Theme from "../constants/constants";
 import * as SecureStore from "expo-secure-store";
 import Header from "../components/Header";
 import Soft from "../components/Soft";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import AsyncStorage from "@react-native-async-storage/async-storage
 const UserDetail = (props, { navigation }) => {
 	let [loginData, setLoginData] = useState({});
 	const [updated, setUpdated] = useState(false);
@@ -78,35 +76,24 @@ const UserDetail = (props, { navigation }) => {
 		getStorageValue("loginInfo");
 	}, []);
 
-	// const sampleData = {
-	// 	username: "Aina Emmanuel",
-	// 	email: "ainae06@gmail.com",
-	// 	img: `https://picsum.photos/${styles.img.width}`,
-	// 	bio: "I am a software developer with 1 week experience with backend engineering",
-	// };
+	const sampleData = {
+		username: "Aina Emmanuel",
+		email: "ainae06@gmail.com",
+		img: `https://picsum.photos/${styles.img.width}`,
+		bio: "I am a software developer with 1 week experience with backend engineering",
+	};
 
 	if (!fontLoaded) {
 		return null;
 	}
 
-	if (user.isLoading == true) {
-		return (
-			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-				<ActivityIndicator size="large" color="#0000ff" />
-			</View>
-		);
-	}
-
 	return (
 		<View style={styles.container}>
-			<Image
-				style={styles.img}
-				source={{ uri: `https://picsum.photos/${styles.img.width}` }}
-			/>
+			<Image style={styles.img} source={{ uri: sampleData.img }} />
 			<Text style={styles.text2}>
-				{("Welcome", user.user_info?.[0]?.username)}
+				{"Welcome", user.user_info?.[0]?.username }
 			</Text>
-			<Text style={styles.bio}> {user.user_info?.[0]?.gender} </Text>
+			<Text style={styles.bio}> { user.user_info?.[0]?.gender } </Text>
 			<Button color="black" style={{}} title="Edit Profile" />
 
 			<View
