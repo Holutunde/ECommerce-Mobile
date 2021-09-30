@@ -25,6 +25,7 @@ const UserDetail = (props, { navigation }) => {
 		Gem: require("../assets/fonts/GemunuLibre-VariableFont_wght.ttf"),
 		Itl: require("../assets/fonts/Italianno-Regular.ttf"),
 		El: require("../assets/fonts/ElMessiri-VariableFont_wght.ttf"),
+		Jos: require("../assets/fonts/JosefinSans-VariableFont_wght.ttf"),
 	});
 
 	const backToLogin = () => {
@@ -36,13 +37,14 @@ const UserDetail = (props, { navigation }) => {
 			const data = await AsyncStorage.getItem(key);
 			parsedData = JSON.parse(data);
 			if (parsedData.success == false) {
-				Alert.alert("Invalid Details", parsedData.error, [
-					{
-						text: "Cancel",
-						style: "default",
-						onPress: backToLogin,
-					},
-				]);
+				alert('Invalid Email or Password')
+				// Alert.alert("Invalid Details", parsedData.error, [
+				// 	{
+				// 		text: "Cancel",
+				// 		style: "default",
+				// 		onPress: backToLogin,
+				// 	},
+				// ]);
 				return;
 			} else {
 				setLoginData(parsedData);
@@ -66,7 +68,7 @@ const UserDetail = (props, { navigation }) => {
 				},
 			});
 			const data = await response.json();
-			setUser({ user_info: data.results, isLoading: false });
+			setUser({ user_info: data, isLoading: false });
 		} catch (error) {
 			alert(error);
 		}
@@ -87,11 +89,43 @@ const UserDetail = (props, { navigation }) => {
 		return null;
 	}
 
+<<<<<<< HEAD
 	return (
 		<View style={styles.container}>
 			<Image style={styles.img} source={{ uri: sampleData.img }} />
 			<Text style={styles.text2}>
 				{"Welcome", user.user_info?.[0]?.username }
+=======
+	if (user.isLoading == true) {
+		return (
+			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+				<ActivityIndicator size="large" color={Theme.primary} />
+			</View>
+		);
+	}
+
+	return (
+		<View style={styles.container}>
+			<View
+				style={{
+					height: "30%",
+					backgroundColor: Theme.primary,
+					width: "100%",
+					justifyContent: "center",
+					alignItems: "center",
+					borderRadius: 40,
+				}}
+			>
+				<TouchableOpacity style={styles.imageCircleBack}>
+					<Image
+						style={styles.img}
+						source={{ uri: user.user_info?.[0]?.profile_picture }}
+					/>
+				</TouchableOpacity>
+			</View>
+			<Text style={styles.text2}>
+				Welcome, {user.user_info?.[0]?.username}
+>>>>>>> c3085ac... loading, pagination removed, user image
 			</Text>
 			<Text style={styles.bio}> { user.user_info?.[0]?.gender } </Text>
 			<Button color="black" style={{}} title="Edit Profile" />
@@ -124,7 +158,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		alignItems: "center",
-		marginTop: 50,
+		// marginTop: 50,
 	},
 
 	bio: {
@@ -133,12 +167,12 @@ const styles = StyleSheet.create({
 	},
 	footerText: {
 		fontSize: 15,
-		fontFamily: Theme.font,
+		fontFamily: "Jos",
 		color: "grey",
 	},
 	text2: {
 		fontSize: 30,
-		fontFamily: Theme.font,
+		fontFamily: "Jos",
 	},
 	cardArea: {
 		width: "90%",
@@ -154,8 +188,8 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 	},
 	img: {
-		width: 200,
-		height: 200,
+		width: 500,
+		height: 500,
 		borderRadius: 400 / 2,
 		paddingTop: 30,
 		justifyContent: "center",
@@ -168,6 +202,16 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		marginBottom: 10,
 		borderRadius: 20,
+		backgroundColor: "#cfcfcf",
+	},
+	imageCircleBack: {
+		marginTop: 20,
+		width: 200,
+		height: 200,
+		justifyContent: "center",
+		alignItems: "center",
+		marginBottom: 10,
+		borderRadius: 200,
 		backgroundColor: "#cfcfcf",
 	},
 });
