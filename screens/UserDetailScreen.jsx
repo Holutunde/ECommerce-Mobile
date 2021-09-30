@@ -7,6 +7,7 @@ import {
 	Alert,
 	Image,
 	TouchableOpacity,
+	ActivityIndicator,
 } from "react-native";
 import { useFonts } from "@expo-google-fonts/raleway";
 import Theme from "../constants/constants";
@@ -77,24 +78,35 @@ const UserDetail = (props, { navigation }) => {
 		getStorageValue("loginInfo");
 	}, []);
 
-	const sampleData = {
-		username: "Aina Emmanuel",
-		email: "ainae06@gmail.com",
-		img: `https://picsum.photos/${styles.img.width}`,
-		bio: "I am a software developer with 1 week experience with backend engineering",
-	};
+	// const sampleData = {
+	// 	username: "Aina Emmanuel",
+	// 	email: "ainae06@gmail.com",
+	// 	img: `https://picsum.photos/${styles.img.width}`,
+	// 	bio: "I am a software developer with 1 week experience with backend engineering",
+	// };
 
 	if (!fontLoaded) {
 		return null;
 	}
 
+	if (user.isLoading == true) {
+		return (
+			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+				<ActivityIndicator size="large" color="#0000ff" />
+			</View>
+		);
+	}
+
 	return (
 		<View style={styles.container}>
-			<Image style={styles.img} source={{ uri: sampleData.img }} />
+			<Image
+				style={styles.img}
+				source={{ uri: `https://picsum.photos/${styles.img.width}` }}
+			/>
 			<Text style={styles.text2}>
-				{"Welcome", user.user_info?.[0]?.username }
+				{("Welcome", user.user_info?.[0]?.username)}
 			</Text>
-			<Text style={styles.bio}> { user.user_info?.[0]?.gender } </Text>
+			<Text style={styles.bio}> {user.user_info?.[0]?.gender} </Text>
 			<Button color="black" style={{}} title="Edit Profile" />
 
 			<View
