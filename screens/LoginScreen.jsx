@@ -90,8 +90,12 @@ const Login = (props, { navigation }) => {
 			},
 		});
 
-		const loginLoginData = await response.json();
-		saveToken(loginLoginData);
+		const loginRes = await response.json();
+		if (loginRes.success != true) {
+			alert(loginRes.error);
+			return;
+		}
+		saveToken(loginRes);
 		toUserDetail();
 	};
 
