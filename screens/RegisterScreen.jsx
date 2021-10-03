@@ -117,14 +117,22 @@ const Register = (props, { navigation }) => {
 		});
 
 		const registrationRes = await response.json();
+		if (!registrationRes.success) {
+			alert(registrationRes.email[0]);
+			// props.navigation.navigate("Register");
+			return;
+		}
 		console.log(registrationRes);
 		setIsLoading(false);
-		props.navigation.navigate("Login");
+		alreadyRegistered();
 	};
 
 	const alreadyRegistered = () => {
 		props.navigation.navigate("Login");
 	};
+	// const notRegistered = () => {
+		
+	// };
 
 	if (userData.isLoading == true) {
 		return (
