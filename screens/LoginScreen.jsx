@@ -12,6 +12,7 @@ import {
 	ScrollView,
 	TouchableOpacity,
 	Platform,
+	ToastAndroid
 } from "react-native";
 
 import Theme from "../constants/constants";
@@ -92,7 +93,7 @@ const Login = (props, { navigation }) => {
 
 		const loginRes = await response.json();
 		if (loginRes.success != true) {
-			alert(loginRes.error);
+			ToastAndroid.showWithGravity(loginRes.error, ToastAndroid.SHORT, ToastAndroid.TOP);
 			return;
 		}
 		saveToken(loginRes);
