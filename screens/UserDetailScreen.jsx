@@ -7,6 +7,8 @@ import {
 	Alert,
 	Image,
 	TouchableOpacity,
+	ActivityIndicator,
+	TouchableWithoutFeedback,
 } from "react-native";
 import { useFonts } from "@expo-google-fonts/raleway";
 import Theme from "../constants/constants";
@@ -37,15 +39,31 @@ const UserDetail = (props, { navigation }) => {
 			const data = await AsyncStorage.getItem(key);
 			parsedData = JSON.parse(data);
 			if (parsedData.success == false) {
-				alert('Invalid Email or Password')
-				// Alert.alert("Invalid Details", parsedData.error, [
-				// 	{
-				// 		text: "Cancel",
-				// 		style: "default",
-				// 		onPress: backToLogin,
-				// 	},
-				// ]);
-				return;
+				if (parsedData.error) {
+					Alert.alert("Invalid Details", parsedData.error, [
+						{
+							text: "Cancel",
+							style: "default",
+							onPress: backToLogin,
+						},
+					]);
+				} else {
+					Alert.alert("Invalid Details", parsedData.details, [
+						{
+							text: "Cancel",
+							style: "default",
+							onPress: backToLogin,
+						},
+					]);
+				}
+
+				return (
+					<View
+						style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+					>
+						<ActivityIndicator size="large" color={Theme.primary} />
+					</View>
+				);
 			} else {
 				setLoginData(parsedData);
 				setUpdated(true);
@@ -88,7 +106,7 @@ const UserDetail = (props, { navigation }) => {
 	if (!fontLoaded) {
 		return null;
 	}
-	
+
 	if (user.isLoading == true) {
 		return (
 			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -96,31 +114,78 @@ const UserDetail = (props, { navigation }) => {
 			</View>
 		);
 	}
-
+	// console.log(user.user_info);
 	return (
 		<View style={styles.container}>
 			<View
-				style={{
-					height: "30%",
-					backgroundColor: Theme.primary,
-					width: "100%",
-					justifyContent: "center",
-					alignItems: "center",
-					borderRadius: 40,
-				}}
+				style={{ flex: 0.5, justifyContent: "center", alignItems: "center" }}
 			>
-				<TouchableOpacity style={styles.imageCircleBack}>
-					<Image
-						style={styles.img}
-						source={{ uri: user.user_info?.[0]?.profile_picture }}
-					/>
-				</TouchableOpacity>
+				<Soft style={styles.cardArea}>
+					{/* <Text style={styles.welcomeText}>
+						Welcome, {user.user_info?.[0]?.username}
+					</Text> */}
+					<View
+						style={{ justifyContent: "center", alignItems: "center" }}
+					>
+						<View>
+							<Image
+								style={styles.img}
+								source={{ uri: user.user_info?.[0]?.profile_picture }}
+							/>
+						</View>
+						<View>
+							<Text style={styles.nameText}>
+								{user.user_info?.[0]?.username}
+							</Text>
+						</View>
+						<View>
+							<Text style={styles.mailText}>{user.user_info?.[0]?.email}</Text>
+						</View>
+						<View>
+							<Text style={styles.bioText}>
+								{" "}
+								Hello, I am a software engineer who enjoys coding
+							</Text>
+						</View>
+					</View>
+					<View
+						style={{
+							flex:1,
+							width: "100%",
+							paddingTop: 10,
+							flexDirection: "row",
+							justifyContent: 'space-evenly',
+						}}
+					>
+						<View>
+							<Text style={styles.mailText}>Cart</Text>
+							<Text style={{textAlign:'center'}}>5</Text>
+						</View>
+						<View>
+							<Text style={styles.mailText}>Wishlist</Text>
+						</View>
+						<View>
+							<Text style={styles.mailText}>Liked</Text>
+						</View>
+					</View>
+				</Soft>
+
 			</View>
-			<Text style={styles.text2}>
-				Welcome, {user.user_info?.[0]?.username}
-			</Text>
-			<Text style={styles.bio}> { user.user_info?.[0]?.gender } </Text>
-			<Button color="black" style={{}} title="Edit Profile" />
+			{/* <View style={styles.imageContainer}>
+				<Image
+					style={styles.img}
+					source={{ uri: user.user_info?.[0]?.profile_picture }}
+				/>
+			</View> */}
+
+			<View style={styles.infoStyle}>
+				<Button
+					color={Theme.primary}
+					style={{ paddingTop: 20, marginTop: 40 }}
+					title="Edit Profile"
+					onPress={() => { AsyncStorage.removeItem("loginInfo")}}
+				/>
+			</View>
 
 			<View
 				style={{
@@ -137,11 +202,6 @@ const UserDetail = (props, { navigation }) => {
 					<Text style={styles.footerText}>Joined September 2021</Text>
 				</TouchableOpacity>
 			</View>
-
-			{/* <Soft style={styles.cardArea}> */}
-			{/* <Text style={styles.text2}> {`Welcome ${sampleData.username}!`} </Text> */}
-			{/* <Text style={styles.text2}> ₦{user.user_info?.[0]?.email} </Text> */}
-			{/* </Soft> */}
 		</View>
 	);
 };
@@ -149,27 +209,41 @@ const UserDetail = (props, { navigation }) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		alignItems: "center",
-		// marginTop: 50,
+		flexDirection: "column",
+		// marginTop: 150,
 	},
-
-	bio: {
-		fontSize: 20,
+	nameText: {
+		fontSize: 17,
+		fontFamily: "El",
+		color: "black",
+	},
+	mailText: {
+		fontSize: 15,
 		fontFamily: Theme.font,
+		color: "grey",
+	},
+	bioText: {
+		fontSize: 15,
+		fontFamily: Theme.font,
+		paddingBottom: 20,
+		color: "grey",
 	},
 	footerText: {
 		fontSize: 15,
-		fontFamily: "Jos",
-		color: "grey",
+		// fontFamily: "Jos",
+		color: "#ffff",
 	},
-	text2: {
+	welcomeText: {
 		fontSize: 30,
-		fontFamily: "Jos",
+		justifyContent: "flex-start",
+		color: "black",
+		fontFamily: "El",
+		fontStyle: "normal",
 	},
 	cardArea: {
-		width: "90%",
-		padding: 20,
-		alignItems: "flex-start",
+		flex: 1,
+		width: "100%",
+		padding: 0,
 	},
 	loginVector: {
 		width: 150,
@@ -180,11 +254,11 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 	},
 	img: {
-		width: 500,
-		height: 500,
+		width: 150,
+		height: 150,
 		borderRadius: 400 / 2,
-		paddingTop: 30,
-		justifyContent: "center",
+		marginTop: 100,
+		// justifyContent: "center",
 	},
 	roundButton2: {
 		marginTop: 20,
@@ -194,7 +268,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		marginBottom: 10,
 		borderRadius: 20,
-		backgroundColor: "#cfcfcf",
+		backgroundColor: Theme.primary,
 	},
 	imageCircleBack: {
 		marginTop: 20,
@@ -205,6 +279,19 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
 		borderRadius: 200,
 		backgroundColor: "#cfcfcf",
+	},
+	themeStyle: {
+		height: "30%",
+		backgroundColor: Theme.primary,
+		width: "100%",
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 40,
+	},
+
+	infoStyle: {
+		justifyContent: "center",
+		alignItems: "center",
 	},
 });
 
