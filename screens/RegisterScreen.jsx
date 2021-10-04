@@ -10,6 +10,8 @@ import {
 	Keyboard,
 	KeyboardAvoidingView,
 	TouchableOpacity,
+	ToastAndroid,
+	ActivityIndicator,
 } from "react-native";
 
 import Theme from "../constants/constants";
@@ -21,7 +23,7 @@ import Header from "../components/Header";
 import Feather from "react-native-vector-icons/Feather";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import * as Animatable from "react-native-animatable";
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from "@react-native-picker/picker";
 
 const Register = (props, { navigation }) => {
 	const [fontLoaded, error] = useFonts({
@@ -34,23 +36,19 @@ const Register = (props, { navigation }) => {
 		email: "",
 		username: "",
 		password: "",
-		gender:"Male",
+		gender: "Male",
 		check_textInputChange: false,
 		secureTextEntry: true,
 	});
-	const [isLoading, setIsLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 
- 
-	const [ sex ] = useState(
-		["Male","Female","Others"].sort());
+	const [sex] = useState(["Male", "Female", "Others"].sort());
 
-	
-	const handlePickerChange = (val) => {		
-			setUserData({
-				...userData,
-				gender: val,
-			});
-	
+	const handlePickerChange = (val) => {
+		setUserData({
+			...userData,
+			gender: val,
+		});
 	};
 
 	const textInputChange = (val) => {
@@ -60,18 +58,15 @@ const Register = (props, { navigation }) => {
 				username: val,
 				check_textInputChange: true,
 			});
-		};
-	}
-
-	const textEmailChange = (val) => {		
-			setUserData({
-				...userData,
-				email: val,
-			});
-	
+		}
 	};
 
-
+	const textEmailChange = (val) => {
+		setUserData({
+			...userData,
+			email: val,
+		});
+	};
 
 	const handlePasswordChange = (val) => {
 		setUserData({
@@ -95,35 +90,50 @@ const Register = (props, { navigation }) => {
 	};
 
 	const performSignup = async () => {
-		setIsLoading(true);
+		setLoading(true);
 		const signupUrl =
 			"https://ecomm-store-proj.herokuapp.com/api/v1/account/signup";
-		console.log('User Data',userData)
+		// console.log("User Data", userData);
 		const email = userData.email;
 		const password = userData.password;
 		const username = userData.username;
 		const gender = userData.gender;
 
 		const registerDetails = { email, password, username, gender };
-		console.log(`Register Details ====> ${registerDetails}`);
+		try {
+			const response = await fetch(signupUrl, {
+				method: "POST",
+				body: JSON.stringify(registerDetails),
+				headers: {
+					"Content-type": "application/json",
+					Accept: "application/json",
+				},
+			});
+			var registrationRes = await response.json();
+		} catch (error) {
+			ToastAndroid.showWithGravity(
+				"Please fill all regiatrstion detail",
+				ToastAndroid.SHORT,
+				ToastAndroid.TOP
+			);
+		}
 
-		const response = await fetch(signupUrl, {
-			method: "POST",
-			body: JSON.stringify(registerDetails),
-			headers: {
-				"Content-type": "application/json",
-				Accept: "application/json",
-			},
-		});
-
-		const registrationRes = await response.json();
-		if (!registrationRes.success) {
-			alert(registrationRes.email[0]);
+		if (registrationRes.success != true) {
+			ToastAndroid.showWithGravity(
+				registrationRes.email[0],
+				ToastAndroid.LONG,
+				ToastAndroid.CENTER
+			);
+			// alert(registrationRes.email[0]);
 			// props.navigation.navigate("Register");
 			return;
 		}
-		console.log(registrationRes);
-		setIsLoading(false);
+		setLoading(false);
+		ToastAndroid.showWithGravity(
+			registrationRes.message,
+			ToastAndroid.LONG,
+			ToastAndroid.CENTER
+		);
 		alreadyRegistered();
 	};
 
@@ -131,10 +141,10 @@ const Register = (props, { navigation }) => {
 		props.navigation.navigate("Login");
 	};
 	// const notRegistered = () => {
-		
+
 	// };
 
-	if (userData.isLoading == true) {
+	if (loading == true) {
 		return (
 			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
 				<ActivityIndicator size="large" color={Theme.primary} />
@@ -203,32 +213,25 @@ const Register = (props, { navigation }) => {
 								<Feather name="eye" color="grey" size={20} />
 							)}
 						</TouchableOpacity>
-					 </View>
-			
+					</View>
 
 					<View style={styles.gender}>
-						<Text style={styles.pickerText}>
-                           Gender:
-						</Text>
+						<Text style={styles.pickerText}>Gender:</Text>
 						<View style={styles.pickerBox}>
-					   <Picker
-					    style={styles.picker}
-						selectedValue = {userData.gender}
-						onValueChange = {(itemValue) => {handlePickerChange(itemValue)}}
-						>
-						{
-						  sex.map((item) => (
-							<Picker.Item 
-							  key={item}
-							  label = {item} 
-							  value = {item}/>
-						  ))
-						}
-
-					   </Picker>
-					   </View>
+							<Picker
+								style={styles.picker}
+								selectedValue={userData.gender}
+								onValueChange={(itemValue) => {
+									handlePickerChange(itemValue);
+								}}
+							>
+								{sex.map((item) => (
+									<Picker.Item key={item} label={item} value={item} />
+								))}
+							</Picker>
+						</View>
 					</View>
-                		
+
 					<TouchableOpacity onPress={performSignup} style={styles.signIn}>
 						<Text style={styles.textSign}>Sign up</Text>
 					</TouchableOpacity>
@@ -254,7 +257,6 @@ const Register = (props, { navigation }) => {
 							Login
 						</Text>
 					</View>
-					
 				</View>
 			</TouchableWithoutFeedback>
 		</KeyboardAvoidingView>
@@ -264,8 +266,8 @@ const Register = (props, { navigation }) => {
 const styles = StyleSheet.create({
 	register: {
 		flex: 1,
-		justifyContent:'center',
-		alignItems:'center'
+		justifyContent: "center",
+		alignItems: "center",
 	},
 	inputArea: {
 		justifyContent: "center",
@@ -276,7 +278,6 @@ const styles = StyleSheet.create({
 	registerVector: {
 		width: 300,
 		height: 300,
-	
 	},
 
 	toLogin: {
@@ -329,15 +330,15 @@ const styles = StyleSheet.create({
 		paddingLeft: 10,
 		color: "#05375a",
 	},
-	gender:{
-       flexDirection:'row',
-	   marginTop:30
+	gender: {
+		flexDirection: "row",
+		marginTop: 30,
 	},
-	picker:{
+	picker: {
 		width: 150,
-		height:30
+		height: 30,
 	},
-	pickerBox:{
+	pickerBox: {
 		borderWidth: 1,
 		borderColor: "#f2f2f2",
 		paddingBottom: 6,
@@ -345,10 +346,10 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 5,
 		borderRadius: 10,
 	},
-	pickerText:{
-       paddingRight:20,
-	   paddingTop:10
-	}
+	pickerText: {
+		paddingRight: 20,
+		paddingTop: 10,
+	},
 });
 
 export default Register;
