@@ -44,7 +44,6 @@ export default function App() {
 		const checkAccessToken = async () => {
 			setLoading(true);
 			const data = await AsyncStorage.getItem("loginInfo");
-			console.log(data)
 			if (data == null) {
 				setIsLoggedIn(false);
 				setLoading(false);
