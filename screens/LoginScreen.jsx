@@ -27,6 +27,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Google from "expo-google-app-auth";
 import GoogleAuthButton from "../components/GoogleAuth";
+import { saveToken, handleGoogleSignIn } from "../helper";
 // import {GoogleSigninButton } from "react-native-google-signin";
 
 const Login = (props, { navigation }) => {
@@ -114,68 +115,15 @@ const Login = (props, { navigation }) => {
 		saveToken(loginRes);
 		toUserDetail();
 	};
-
-	const saveToken = async (loginData) => {
-		try {
-			const jsonLoginData = JSON.stringify(loginData);
-			await AsyncStorage.setItem("loginInfo", jsonLoginData);
-		} catch (error) {
-			alert(error);
-		}
-	};
-
-	const handleGoogleSignIn = async () => {
-		setLoading(true);
-		const config = {
-			androidClientId: `341224720546-si07qsfk5m4jji02n3hq1jqkbcfcpds9.apps.googleusercontent.com`,
-			// androidClientId: `341224720546-eo0srsqripcjus508s371ajk7peim1u5.apps.googleusercontent.com`,
-			scopes: ["email", "profile"],
-		};
-		// await Google.logInAsync(config)
-		// 	.then((result) => { console.log(result) })
-		// 	.catch((error) => {
-		// 		alert(error)
-		// 	})
-		const data = await Google.logInAsync(config);
-
-		console.log(data.idToken);
-		// const parsedData = JSON.parse(data)
-		setLoading(false);
-		authWithGoogle(data.idToken);
-	};
-
-	const authWithGoogle = async (idToken) => {
-		setLoading(true);
-		const googleAuthUrl = `https://ecomm-store-proj.herokuapp.com/api/v1/social_auth/google/`;
-		const auth_token = idToken;
-		const details = { auth_token };
-		const response = await fetch(googleAuthUrl, {
-			method: "POST",
-			body: JSON.stringify(details),
-			headers: {
-				"Content-type": "application/json",
-				Accept: "application/json",
-			},
-		});
-
-		const socialAuthResponse = await response.json();
-		console.log("Social Auth Response", socialAuthResponse);
-		// if (loginRes.success != true) {
-		// 	ToastAndroid.showWithGravity(
-		// 		loginRes.error,
-		// 		ToastAndroid.SHORT,
-		// 		ToastAndroid.TOP
-		// 	);
-		// 	return;
-		// }
-		saveToken(socialAuthResponse);
-		setLoading(false);
-		toUserDetail();
-	};
-
+	
 	const toUserDetail = () => {
 		props.navigation.navigate("UserDetail");
 	};
+
+	const continueWithGoogle = async () => {
+		await handleGoogleSignIn();
+		await props.navigation.navigate("UserDetail");
+	}
 	if (!fontLoaded) {
 		return null;
 	}
@@ -244,7 +192,7 @@ const Login = (props, { navigation }) => {
 							<Text style={styles.textSign}>Log in</Text>
 						</TouchableOpacity>
 
-						<GoogleAuthButton googleAuth={handleGoogleSignIn} />
+						<GoogleAuthButton googleAuth={continueWithGoogle} />
 
 						<View style={styles.toRegister}>
 							<Text style={{ fontSize: 20, fontFamily: Theme.font }}>

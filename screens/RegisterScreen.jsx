@@ -23,6 +23,8 @@ import Header from "../components/Header";
 import Feather from "react-native-vector-icons/Feather";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import * as Animatable from "react-native-animatable";
+import GoogleAuthButton from "../components/GoogleAuth";
+import { saveToken, handleGoogleSignIn } from "../helper";
 import { Picker } from "@react-native-picker/picker";
 
 const Register = (props, { navigation }) => {
@@ -140,9 +142,6 @@ const Register = (props, { navigation }) => {
 	const alreadyRegistered = () => {
 		props.navigation.navigate("Login");
 	};
-	// const notRegistered = () => {
-
-	// };
 
 	if (loading == true) {
 		return (
@@ -150,6 +149,15 @@ const Register = (props, { navigation }) => {
 				<ActivityIndicator size="large" color={Theme.primary} />
 			</View>
 		);
+	}
+
+	const toUserDetail = () => {
+		props.navigation.navigate("UserDetail");
+	};
+
+	const continueWithGoogle = () => {
+		handleGoogleSignIn();
+		toUserDetail();
 	}
 
 	return (
@@ -164,7 +172,6 @@ const Register = (props, { navigation }) => {
 						style={styles.registerVector}
 						source={require("../assets/register.jpg")}
 					/>
-
 					<View style={styles.action}>
 						<Feather name="mail" color="#05375a" size={20} />
 						<TextInput
@@ -193,7 +200,6 @@ const Register = (props, { navigation }) => {
 							</Animatable.View>
 						) : null}
 					</View>
-
 					<View style={styles.action}>
 						<Feather name="lock" color="#05375a" size={20} />
 						<TextInput
@@ -214,7 +220,6 @@ const Register = (props, { navigation }) => {
 							)}
 						</TouchableOpacity>
 					</View>
-
 					<View style={styles.gender}>
 						<Text style={styles.pickerText}>Gender:</Text>
 						<View style={styles.pickerBox}>
@@ -231,10 +236,10 @@ const Register = (props, { navigation }) => {
 							</Picker>
 						</View>
 					</View>
-
 					<TouchableOpacity onPress={performSignup} style={styles.signIn}>
 						<Text style={styles.textSign}>Sign up</Text>
 					</TouchableOpacity>
+					<GoogleAuthButton googleAuth={continueWithGoogle} />;
 					<View style={styles.toLogin}>
 						<Text
 							style={{
