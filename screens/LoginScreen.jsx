@@ -10,21 +10,27 @@ import {
 	TouchableWithoutFeedback,
 	Alert,
 	ScrollView,
+	ActivityIndicator,
 	TouchableOpacity,
 	Platform,
-	ToastAndroid
+	ToastAndroid,
 } from "react-native";
+
 
 import Theme from "../constants/constants";
 import Soft from "../components/Soft";
-import { useFonts } from "@expo-google-fonts/raleway";
+import { useFonts } from "expo-font";
 import * as SecureStore from "expo-secure-store";
 import * as Animatable from "react-native-animatable";
 import Feather from "react-native-vector-icons/Feather";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Google from "expo-google-app-auth";
+import GoogleAuthButton from "../components/GoogleAuth";
+// import {GoogleSigninButton } from "react-native-google-signin";
 
 const Login = (props, { navigation }) => {
+	const [loading, setLoading] = useState(false);
 	let [fontLoaded] = useFonts({
 		El: require("../assets/fonts/ElMessiri-VariableFont_wght.ttf"),
 		Gem: require("../assets/fonts/GemunuLibre-VariableFont_wght.ttf"),
@@ -68,6 +74,7 @@ const Login = (props, { navigation }) => {
 			secureTextEntry: !loginData.secureTextEntry,
 		});
 	};
+
 	const notRegistered = () => {
 		props.navigation.navigate("Register");
 	};
@@ -75,13 +82,14 @@ const Login = (props, { navigation }) => {
 	const Registered = () => {
 		props.navigation.navigate("Products");
 	};
-	const loginUrl =
-		"https://ecomm-store-proj.herokuapp.com/api/v1/account/login";
 
 	const performLogin = async () => {
+		const loginUrl =
+			"https://ecomm-store-proj.herokuapp.com/api/v1/account/login";
 		const email = loginData.email;
 		const password = loginData.password;
 		const details = { email, password };
+		setLoading(true);
 		const response = await fetch(loginUrl, {
 			method: "POST",
 			body: JSON.stringify(details),
@@ -93,9 +101,16 @@ const Login = (props, { navigation }) => {
 
 		const loginRes = await response.json();
 		if (loginRes.success != true) {
-			ToastAndroid.showWithGravity(loginRes.error, ToastAndroid.SHORT, ToastAndroid.TOP);
+			ToastAndroid.showWithGravity(
+				loginRes.error,
+				ToastAndroid.SHORT,
+				ToastAndroid.TOP
+			);
+			setLoading(false);
+
 			return;
 		}
+		setLoading(false);
 		saveToken(loginRes);
 		toUserDetail();
 	};
@@ -109,8 +124,53 @@ const Login = (props, { navigation }) => {
 		}
 	};
 
-	const toProducts = () => {
-		props.navigation.navigate("Products");
+	const handleGoogleSignIn = async () => {
+		setLoading(true);
+		const config = {
+			androidClientId: `341224720546-si07qsfk5m4jji02n3hq1jqkbcfcpds9.apps.googleusercontent.com`,
+			// androidClientId: `341224720546-eo0srsqripcjus508s371ajk7peim1u5.apps.googleusercontent.com`,
+			scopes: ["email", "profile"],
+		};
+		// await Google.logInAsync(config)
+		// 	.then((result) => { console.log(result) })
+		// 	.catch((error) => {
+		// 		alert(error)
+		// 	})
+		const data = await Google.logInAsync(config);
+
+		console.log(data.idToken);
+		// const parsedData = JSON.parse(data)
+		setLoading(false);
+		authWithGoogle(data.idToken);
+	};
+
+	const authWithGoogle = async (idToken) => {
+		setLoading(true);
+		const googleAuthUrl = `https://ecomm-store-proj.herokuapp.com/api/v1/social_auth/google/`;
+		const auth_token = idToken;
+		const details = { auth_token };
+		const response = await fetch(googleAuthUrl, {
+			method: "POST",
+			body: JSON.stringify(details),
+			headers: {
+				"Content-type": "application/json",
+				Accept: "application/json",
+			},
+		});
+
+		const socialAuthResponse = await response.json();
+		console.log("Social Auth Response", socialAuthResponse);
+		// if (loginRes.success != true) {
+		// 	ToastAndroid.showWithGravity(
+		// 		loginRes.error,
+		// 		ToastAndroid.SHORT,
+		// 		ToastAndroid.TOP
+		// 	);
+		// 	return;
+		// }
+		saveToken(socialAuthResponse);
+		setLoading(false);
+		toUserDetail();
 	};
 
 	const toUserDetail = () => {
@@ -119,7 +179,13 @@ const Login = (props, { navigation }) => {
 	if (!fontLoaded) {
 		return null;
 	}
-
+	if (loading == true) {
+		return (
+			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+				<ActivityIndicator size="large" color={Theme.primary} />
+			</View>
+		);
+	}
 	return (
 		<View style={styles.content}>
 			<KeyboardAvoidingView
@@ -127,73 +193,76 @@ const Login = (props, { navigation }) => {
 				behavior={Platform.OS === "ios" ? "padding" : null}
 			>
 				<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-				<ScrollView
-					style={styles.container}
-					contentContainerStyle={{
-						alignItems: "center",
-						justifyContent: "center",
-						flex: 1,
-					}}
-				>
-					<Image
-						style={styles.loginVector}
-						source={require("../pictures/login.jpg")}
-					/>
-
-					<View style={styles.action}>
-						<FontAwesome name="user-o" color="#05375a" size={20} />
-						<TextInput
-							onFocus={() => setFocused(true)}
-							placeholder="Email"
-							style={styles.textInput}
-							autoCapitalize="none"
-							onChangeText={(val) => textInputChange(val)}
+					<ScrollView
+						style={styles.container}
+						contentContainerStyle={{
+							alignItems: "center",
+							justifyContent: "center",
+							flex: 1,
+						}}
+					>
+						<Image
+							style={styles.loginVector}
+							source={require("../pictures/login.jpg")}
 						/>
-						{loginData.check_textInputChange ? (
-							<Animatable.View animation="bounceIn">
-								<Feather name="check-circle" color="green" size={20} />
-							</Animatable.View>
-						) : null}
-					</View>
 
-					<View style={styles.action}>
-						<Feather name="lock" color="#05375a" size={20} />
-						<TextInput
-							placeholder="********"
-							secureTextEntry={loginData.secureTextEntry ? true : false}
-							style={styles.textInput}
-							autoCapitalize="none"
-							onChangeText={(val) => handlePasswordChange(val)}
-						/>
-						<TouchableOpacity onPress={updateSecureTextEntry}>
-							{loginData.secureTextEntry ? (
-								<Feather name="eye-off" color="grey" size={20} />
-							) : (
-								<Feather name="eye" color="grey" size={20} />
-							)}
+						<View style={styles.action}>
+							<FontAwesome name="user-o" color="#05375a" size={20} />
+							<TextInput
+								onFocus={() => setFocused(true)}
+								placeholder="Email"
+								style={styles.textInput}
+								autoCapitalize="none"
+								onChangeText={(val) => textInputChange(val)}
+							/>
+							{loginData.check_textInputChange ? (
+								<Animatable.View animation="bounceIn">
+									<Feather name="check-circle" color="green" size={20} />
+								</Animatable.View>
+							) : null}
+						</View>
+
+						<View style={styles.action}>
+							<Feather name="lock" color="#05375a" size={20} />
+							<TextInput
+								placeholder="********"
+								secureTextEntry={loginData.secureTextEntry ? true : false}
+								style={styles.textInput}
+								autoCapitalize="none"
+								onChangeText={(val) => handlePasswordChange(val)}
+							/>
+							<TouchableOpacity onPress={updateSecureTextEntry}>
+								{loginData.secureTextEntry ? (
+									<Feather name="eye-off" color="grey" size={20} />
+								) : (
+									<Feather name="eye" color="grey" size={20} />
+								)}
+							</TouchableOpacity>
+						</View>
+
+						<TouchableOpacity onPress={performLogin} style={styles.signIn}>
+							<Text style={styles.textSign}>Log in</Text>
 						</TouchableOpacity>
-					</View>
 
-					<TouchableOpacity onPress={performLogin} style={styles.signIn}>
-						<Text style={styles.textSign}>Log in</Text>
-					</TouchableOpacity>
-					<View style={styles.toRegister}>
-						<Text style={{ fontSize: 20, fontFamily: Theme.font }}>
-							Don't have an account?
-						</Text>
-						<Text
-							style={{
-								color: Theme.primary,
-								fontSize: 20,
-								fontFamily: Theme.font,
-								paddingLeft: 10,
-							}}
-							onPress={notRegistered}
-						>
-							Sign up
-						</Text>
-					</View>
-				</ScrollView>
+						<GoogleAuthButton googleAuth={handleGoogleSignIn} />
+
+						<View style={styles.toRegister}>
+							<Text style={{ fontSize: 20, fontFamily: Theme.font }}>
+								Don't have an account?
+							</Text>
+							<Text
+								style={{
+									color: Theme.primary,
+									fontSize: 20,
+									fontFamily: Theme.font,
+									paddingLeft: 10,
+								}}
+								onPress={notRegistered}
+							>
+								Sign up
+							</Text>
+						</View>
+					</ScrollView>
 				</TouchableWithoutFeedback>
 			</KeyboardAvoidingView>
 		</View>
@@ -203,6 +272,13 @@ const Login = (props, { navigation }) => {
 const styles = StyleSheet.create({
 	content: {
 		flex: 1,
+	},
+	googleSignIn: {
+		width: 200,
+		height: 60,
+		flexDirection: 'row',
+		justifyContent: "space-evenly",
+		marginTop: 12,
 	},
 	container: {
 		// backgroundColor: 'red',
