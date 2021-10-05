@@ -156,8 +156,7 @@ const Register = (props, { navigation }) => {
 	};
 
 	const continueWithGoogle = () => {
-		handleGoogleSignIn();
-		toUserDetail();
+		handleGoogleSignIn(props.navigation);
 	}
 
 	return (
@@ -239,7 +238,9 @@ const Register = (props, { navigation }) => {
 					<TouchableOpacity onPress={performSignup} style={styles.signIn}>
 						<Text style={styles.textSign}>Sign up</Text>
 					</TouchableOpacity>
-					<GoogleAuthButton googleAuth={continueWithGoogle} />;
+
+					<GoogleAuthButton googleAuth={continueWithGoogle} />
+
 					<View style={styles.toLogin}>
 						<Text
 							style={{

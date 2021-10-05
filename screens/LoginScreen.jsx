@@ -115,15 +115,15 @@ const Login = (props, { navigation }) => {
 		saveToken(loginRes);
 		toUserDetail();
 	};
-	
+
 	const toUserDetail = () => {
 		props.navigation.navigate("UserDetail");
 	};
 
-	const continueWithGoogle = async () => {
-		await handleGoogleSignIn();
-		await props.navigation.navigate("UserDetail");
-	}
+	const continueWithGoogle = () => {
+		handleGoogleSignIn(props.navigation);
+	};
+	
 	if (!fontLoaded) {
 		return null;
 	}

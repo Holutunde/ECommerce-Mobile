@@ -38,7 +38,16 @@ const UserDetail = (props, { navigation }) => {
 		try {
 			const data = await AsyncStorage.getItem(key);
 			parsedData = JSON.parse(data);
-			if (parsedData.success == false) {
+			console.log(parsedData)
+			if (parsedData == null) {
+									Alert.alert("Error", "Invalid Login Credentials", [
+						{
+							text: "Cancel",
+							style: "default",
+							onPress: backToLogin,
+						},
+					]);
+			} else if (parsedData.success == false) {
 				if (parsedData.error) {
 					Alert.alert("Invalid Details", parsedData.error, [
 						{
