@@ -4,6 +4,7 @@ import {
 	Button,
 	View,
 	Text,
+	ToastAndroid,
 	Alert,
 	Image,
 	TouchableOpacity,
@@ -16,6 +17,7 @@ import * as SecureStore from "expo-secure-store";
 import Header from "../components/Header";
 import Soft from "../components/Soft";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const UserDetail = (props, { navigation }) => {
 	let [loginData, setLoginData] = useState({});
 	const [updated, setUpdated] = useState(false);
@@ -38,15 +40,14 @@ const UserDetail = (props, { navigation }) => {
 		try {
 			const data = await AsyncStorage.getItem(key);
 			parsedData = JSON.parse(data);
-			console.log(parsedData)
+			console.log("Recevied Token => ", parsedData);
 			if (parsedData == null) {
-									Alert.alert("Error", "Invalid Login Credentials", [
-						{
-							text: "Cancel",
-							style: "default",
-							onPress: backToLogin,
-						},
-					]);
+				ToastAndroid.showWithGravity(
+					"Invalid Credentials",
+					ToastAndroid.SHORT,
+					ToastAndroid.TOP
+				);
+				return;
 			} else if (parsedData.success == false) {
 				if (parsedData.error) {
 					Alert.alert("Invalid Details", parsedData.error, [
@@ -133,9 +134,7 @@ const UserDetail = (props, { navigation }) => {
 					{/* <Text style={styles.welcomeText}>
 						Welcome, {user.user_info?.[0]?.username}
 					</Text> */}
-					<View
-						style={{ justifyContent: "center", alignItems: "center" }}
-					>
+					<View style={{ justifyContent: "center", alignItems: "center" }}>
 						<View>
 							<Image
 								style={styles.img}
@@ -159,16 +158,16 @@ const UserDetail = (props, { navigation }) => {
 					</View>
 					<View
 						style={{
-							flex:1,
+							flex: 1,
 							width: "100%",
 							paddingTop: 10,
 							flexDirection: "row",
-							justifyContent: 'space-evenly',
+							justifyContent: "space-evenly",
 						}}
 					>
 						<View>
 							<Text style={styles.mailText}>Cart</Text>
-							<Text style={{textAlign:'center'}}>5</Text>
+							<Text style={{ textAlign: "center" }}>5</Text>
 						</View>
 						<View>
 							<Text style={styles.mailText}>Wishlist</Text>
@@ -178,7 +177,6 @@ const UserDetail = (props, { navigation }) => {
 						</View>
 					</View>
 				</Soft>
-
 			</View>
 			{/* <View style={styles.imageContainer}>
 				<Image
@@ -192,7 +190,9 @@ const UserDetail = (props, { navigation }) => {
 					color={Theme.primary}
 					style={{ paddingTop: 20, marginTop: 40 }}
 					title="Edit Profile"
-					onPress={() => { AsyncStorage.removeItem("loginInfo")}}
+					onPress={() => {
+						AsyncStorage.removeItem("loginInfo");
+					}}
 				/>
 			</View>
 
