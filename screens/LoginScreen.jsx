@@ -13,9 +13,9 @@ import {
 	ActivityIndicator,
 	TouchableOpacity,
 	Platform,
+	Vibration,
 	ToastAndroid,
 } from "react-native";
-
 
 import Theme from "../constants/constants";
 import Soft from "../components/Soft";
@@ -35,6 +35,10 @@ const Login = (props, { navigation }) => {
 	let [fontLoaded] = useFonts({
 		El: require("../assets/fonts/ElMessiri-VariableFont_wght.ttf"),
 		Gem: require("../assets/fonts/GemunuLibre-VariableFont_wght.ttf"),
+		Rbt_r: require("../assets/fonts/Roboto-Regular.ttf"),
+		Rbt_b: require("../assets/fonts/Roboto-Bold.ttf"),
+		DM_r: require("../assets/fonts/DMSans-Regular.ttf"),
+		DM_b: require("../assets/fonts/DMSans-Bold.ttf"),
 	});
 
 	const [isFocused, setFocused] = useState(false);
@@ -84,36 +88,57 @@ const Login = (props, { navigation }) => {
 		props.navigation.navigate("Products");
 	};
 
+	const showToast = (message) => {
+		ToastAndroid.showWithGravity(
+			message,
+			ToastAndroid.LONG,
+			ToastAndroid.CENTER
+		);
+	};
+
 	const performLogin = async () => {
+		setLoading(true);
 		const loginUrl =
 			"https://ecomm-store-proj.herokuapp.com/api/v1/account/login";
 		const email = loginData.email;
 		const password = loginData.password;
 		const details = { email, password };
-		setLoading(true);
-		const response = await fetch(loginUrl, {
-			method: "POST",
-			body: JSON.stringify(details),
-			headers: {
-				"Content-type": "application/json",
-				Accept: "application/json",
-			},
-		});
+		try {
+			const response = await fetch(loginUrl, {
+				method: "POST",
+				body: JSON.stringify(details),
+				headers: {
+					"Content-type": "application/json",
+					Accept: "application/json",
+				},
+			});
 
-		const loginRes = await response.json();
-		if (loginRes.success != true) {
-			ToastAndroid.showWithGravity(
-				loginRes.error,
-				ToastAndroid.SHORT,
-				ToastAndroid.TOP
-			);
+			const loginRes = await response.json();
+			console.log("Login Response", loginRes)
+			if (loginRes.success == undefined) {
+				const message = `${Object.keys(loginRes)} ${
+					Object.values(loginRes)[0][0]
+				}`;
+				showToast(message);
+				setLoading(false);
+
+				return;
+			} else if (loginRes.success == false) {
+				const message = loginRes.error;
+				showToast(message);
+				setLoading(false);
+				return;
+			} else {
+				setLoading(false);
+				saveToken(loginRes);
+				toUserDetail();
+			}
+		} catch (error) {
+			let message = "Please fill all registration detail";
 			setLoading(false);
-
+			showToast(message);
 			return;
 		}
-		setLoading(false);
-		saveToken(loginRes);
-		toUserDetail();
 	};
 
 	const toUserDetail = () => {
@@ -122,11 +147,14 @@ const Login = (props, { navigation }) => {
 
 	const continueWithGoogle = () => {
 		handleGoogleSignIn(props.navigation);
+		Vibration.vibrate();
+
 	};
-	
+
 	if (!fontLoaded) {
 		return null;
 	}
+
 	if (loading == true) {
 		return (
 			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -224,7 +252,7 @@ const styles = StyleSheet.create({
 	googleSignIn: {
 		width: 200,
 		height: 60,
-		flexDirection: 'row',
+		flexDirection: "row",
 		justifyContent: "space-evenly",
 		marginTop: 12,
 	},
