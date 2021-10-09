@@ -21,6 +21,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const UserDetail = (props, { navigation }) => {
 	let [loginData, setLoginData] = useState({});
 	const [updated, setUpdated] = useState(false);
+
 	const [user, setUser] = useState({ user_info: [], isLoading: false });
 
 	const userInfourl = "https://ecomm-store-proj.herokuapp.com/api/v1/user";
@@ -35,19 +36,24 @@ const UserDetail = (props, { navigation }) => {
 	const backToLogin = () => {
 		props.navigation.navigate("Login");
 	};
+	const showToast = (message) => {
+		ToastAndroid.showWithGravity(
+			message,
+			ToastAndroid.LONG,
+			ToastAndroid.CENTER
+		);
+	};
 
 	const getStorageValue = async (key) => {
+		user.isLoading = true;
 		try {
 			const data = await AsyncStorage.getItem(key);
 			parsedData = JSON.parse(data);
-			console.log("Recevied Token => ", parsedData);
+			console.log("Parsed Detail TOken", parsedData);
+			user.isLoading = false;
 			if (parsedData == null) {
-				ToastAndroid.showWithGravity(
-					"Invalid Credentials",
-					ToastAndroid.SHORT,
-					ToastAndroid.TOP
-				);
-				return;
+				showToast("Invalid Credentials, please login again")
+				backToLogin();
 			} else if (parsedData.success == false) {
 				if (parsedData.error) {
 					Alert.alert("Invalid Details", parsedData.error, [
@@ -67,20 +73,22 @@ const UserDetail = (props, { navigation }) => {
 					]);
 				}
 
-				return (
-					<View
-						style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-					>
-						<ActivityIndicator size="large" color={Theme.primary} />
-					</View>
-				);
+				// return (
+				// 	<View
+				// 		style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+				// 	>
+				// 		<ActivityIndicator size="large" color={Theme.primary} />
+				// 	</View>
+				// );
+			} else if (parsedData.detail) {
+				showToast(parsedData.detail);
+				backToLogin();
 			} else {
 				setLoginData(parsedData);
-				setUpdated(true);
 				getUser(parsedData.access);
 			}
 		} catch (error) {
-			alert(error);
+			showToast("Token not found");
 		}
 	};
 
@@ -178,12 +186,6 @@ const UserDetail = (props, { navigation }) => {
 					</View>
 				</Soft>
 			</View>
-			{/* <View style={styles.imageContainer}>
-				<Image
-					style={styles.img}
-					source={{ uri: user.user_info?.[0]?.profile_picture }}
-				/>
-			</View> */}
 
 			<View style={styles.infoStyle}>
 				<Button
