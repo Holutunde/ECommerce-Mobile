@@ -32,7 +32,6 @@ export async function handleGoogleSignIn(navigation) {
 		);
 		return;
 	}
-	console.log("Google Auth Response", data);
 
 	// const parsedData = JSON.parse(data)
 	authWithGoogle(data.idToken, navigation);
