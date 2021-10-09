@@ -12,13 +12,13 @@ import {
 	TouchableOpacity,
 	ToastAndroid,
 	ActivityIndicator,
+	Vibration,
 } from "react-native";
 
 import Theme from "../constants/constants";
 import Soft from "../components/Soft";
 import { AppLoading } from "expo-app-loading";
 import { useFonts } from "expo-font";
-// import {useFonts,} from "@expo-google-fonts/raleway";
 import Header from "../components/Header";
 import Feather from "react-native-vector-icons/Feather";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -32,6 +32,10 @@ const Register = (props, { navigation }) => {
 		Gem: require("../assets/fonts/GemunuLibre-VariableFont_wght.ttf"),
 		Itl: require("../assets/fonts/Italianno-Regular.ttf"),
 		El: require("../assets/fonts/ElMessiri-VariableFont_wght.ttf"),
+		Rbt_r: require("../assets/fonts/Roboto-Regular.ttf"),
+		Rbt_b: require("../assets/fonts/Roboto-Bold.ttf"),
+		DM_r: require("../assets/fonts/DMSans-Regular.ttf"),
+		DM_b: require("../assets/fonts/DMSans-Bold.ttf"),
 	});
 
 	const [userData, setUserData] = useState({
@@ -91,6 +95,14 @@ const Register = (props, { navigation }) => {
 		});
 	};
 
+	const showToast = (message) => {
+		ToastAndroid.showWithGravity(
+			message,
+			ToastAndroid.LONG,
+			ToastAndroid.CENTER
+		);
+	};
+
 	const performSignup = async () => {
 		setLoading(true);
 		const signupUrl =
@@ -102,7 +114,9 @@ const Register = (props, { navigation }) => {
 		const gender = userData.gender;
 
 		const registerDetails = { email, password, username, gender };
+
 		try {
+			// console.log("UserData", registerDetails);
 			const response = await fetch(signupUrl, {
 				method: "POST",
 				body: JSON.stringify(registerDetails),
@@ -111,32 +125,30 @@ const Register = (props, { navigation }) => {
 					Accept: "application/json",
 				},
 			});
-			var registrationRes = await response.json();
-		} catch (error) {
-			ToastAndroid.showWithGravity(
-				"Please fill all regiatrstion detail",
-				ToastAndroid.SHORT,
-				ToastAndroid.TOP
-			);
-		}
 
-		if (registrationRes.success != true) {
-			ToastAndroid.showWithGravity(
-				registrationRes.email[0],
-				ToastAndroid.LONG,
-				ToastAndroid.CENTER
-			);
-			// alert(registrationRes.email[0]);
-			// props.navigation.navigate("Register");
+			var registrationRes = await response.json();
+
+			if (!registrationRes.success) {
+				const message = `${Object.keys(registrationRes)} : ${
+					Object.values(registrationRes)[0][0]
+				}`;
+				setLoading(false);
+
+				showToast(message);
+				return;
+			} else {
+				const message = Object.values(registrationRes)[0][0];
+				showToast(message);
+				setLoading(false);
+				alreadyRegistered();
+			}
+		} catch (error) {
+			console.log("There was an error");
+			let message = "Please fill all registration detail";
+			setLoading(false);
+			showToast(message);
 			return;
 		}
-		setLoading(false);
-		ToastAndroid.showWithGravity(
-			registrationRes.message,
-			ToastAndroid.LONG,
-			ToastAndroid.CENTER
-		);
-		alreadyRegistered();
 	};
 
 	const alreadyRegistered = () => {
@@ -157,7 +169,8 @@ const Register = (props, { navigation }) => {
 
 	const continueWithGoogle = () => {
 		handleGoogleSignIn(props.navigation);
-	}
+		Vibration.vibrate();
+	};
 
 	return (
 		<KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
